@@ -1,6 +1,5 @@
 ﻿{
-  "id": "antigravity-execution-pilot",
-  "name": "Antigravity Execution Pilot",
-  "version": "1.0.0",
-  "description": "Global dynamic command governance, pre-flight safety, and anti-repetition system for Antigravity 2.0 on Windows PowerShell."
+  "name": "antigravity-execution-pilot",
+  "description": "Global dynamic command governance, pre-flight safety, and anti-repetition system for Antigravity 2.0 on Windows PowerShell.",
+  "version": "1.0.0"
 }
