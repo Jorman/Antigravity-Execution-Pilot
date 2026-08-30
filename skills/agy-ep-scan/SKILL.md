@@ -1,4 +1,9 @@
-﻿# Workflow /agy-ep-scan
+﻿---
+name: agy-ep-scan
+description: Scans the current conversation for recurring error patterns (Fast, local learning)
+---
+
+# Local Scanner (/agy-ep-scan)
 
 Analizza i log degli eventi della chat corrente per identificare errori ricorrenti ed estrarre proposte di regola.
 

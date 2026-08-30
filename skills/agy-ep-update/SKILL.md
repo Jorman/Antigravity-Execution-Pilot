@@ -1,6 +1,6 @@
 ﻿---
-name: agy-ep-alternatives
-description: Use this skill to discover available tools, identify installed alternatives (such as ripgrep instead of grep, or MCP servers instead of CLI tools), and prevent unnecessary software installations.
+name: agy-ep-update
+description: Updates the alternative registry with newly discovered tools
 ---
 
 # Command Alternatives Skill
@@ -18,4 +18,5 @@ Use this skill to identify installed alternatives and avoid redundant package in
 3. Is it `gh`? -> Use the Antigravity `github` MCP server tools.
 4. Is it a Unix shell (`bash`/`sh`)? -> Convert syntax to PowerShell.
 5. Is an installation strictly required? -> Request user approval first.
+
 

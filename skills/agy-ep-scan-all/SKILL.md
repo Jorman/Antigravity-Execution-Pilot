@@ -1,4 +1,9 @@
-﻿# Workflow /agy-ep-scan-all
+﻿---
+name: agy-ep-scan-all
+description: Scans all historical conversations across all projects (Global learning, takes longer)
+---
+
+# Global Scanner (/agy-ep-scan-all)
 
 Analizza GLOBALMENTE i log degli eventi di TUTTE le chat e progetti passati per identificare errori ricorrenti ed estrarre proposte di regola.
 
