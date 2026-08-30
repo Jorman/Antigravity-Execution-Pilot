@@ -1,0 +1,16 @@
+﻿{
+  "antigravity-execution-pilot-guard": {
+    "PreToolUse": [
+      {
+        "matcher": "run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell.exe -ExecutionPolicy Bypass -File \"%USERPROFILE%\\.gemini\\config\\antigravity-execution-pilot\\scripts\\hook-pre-tool.ps1\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

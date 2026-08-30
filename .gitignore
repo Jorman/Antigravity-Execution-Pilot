@@ -1,0 +1,14 @@
+﻿# State files (machine-specific, not for sharing)
+# Uncomment if you want to exclude local state:
+# ../antigravity-execution-pilot/events/
+# ../antigravity-execution-pilot/registry/
+# ../antigravity-execution-pilot/backups/
+
+# Temp files
+*.tmp
+__temp_script.cjs
+__temp_script.py
+
+# OS
+Thumbs.db
+.DS_Store

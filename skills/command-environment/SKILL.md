@@ -1,0 +1,20 @@
+﻿---
+name: agy-ep-environment
+description: Use this skill to audit, scan, and inspect the host operating system, PowerShell version, PATH variables, filesystems (including SMB network shares), and execution permissions.
+---
+
+# Command Environment Skill
+
+Use this skill to inspect and verify the execution environment.
+
+## When to Use
+- At the start of new sessions or when diagnosing environment-specific errors.
+- When verifying whether a path is on a local drive (C:\) or SMB network share (J:\).
+- When checking PowerShell version or user permission elevation.
+
+## Procedure
+1. Run `detect-environment.ps1`:
+   `powershell -ExecutionPolicy Bypass -File C:\Users\jorma\.gemini\config\antigravity-execution-pilot\scripts\detect-environment.ps1`
+2. Inspect the output registry in `~/.gemini/config/antigravity-execution-pilot/registry/environment-registry.json`.
+3. Check filesystem capabilities and permission grants before planning heavy disk I/O.
+

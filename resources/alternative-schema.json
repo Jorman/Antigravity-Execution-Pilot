@@ -1,0 +1,11 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AlternativeRegistrySchema",
+  "type": "object",
+  "required": ["schemaVersion", "lastScan", "capabilities"],
+  "properties": {
+    "schemaVersion": { "type": "integer" },
+    "lastScan": { "type": "string" },
+    "capabilities": { "type": "array" }
+  }
+}

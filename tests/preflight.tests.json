@@ -1,0 +1,58 @@
+﻿[
+    {
+        "testId":  "test-pf-allow",
+        "test":  "preflight_allow_valid",
+        "expected":  "ALLOW",
+        "actual":  "ALLOW",
+        "pass":  true
+    },
+    {
+        "testId":  "test-pf-rewrite-and",
+        "test":  "preflight_rewrite_and_operator",
+        "expected":  "REWRITE",
+        "actual":  "REWRITE",
+        "pass":  true
+    },
+    {
+        "testId":  "test-pf-use-alt-grep",
+        "test":  "preflight_alternative_grep",
+        "expected":  "USE_ALTERNATIVE",
+        "actual":  "USE_ALTERNATIVE",
+        "pass":  true
+    },
+    {
+        "testId":  "test-pf-rewrite-node",
+        "test":  "preflight_rewrite_node_eval",
+        "expected":  "REWRITE",
+        "actual":  "REWRITE",
+        "pass":  true
+    },
+    {
+        "testId":  "test-pf-block-bash",
+        "test":  "preflight_block_unix_shell",
+        "expected":  "BLOCK",
+        "actual":  "BLOCK",
+        "pass":  true
+    },
+    {
+        "testId":  "test-pf-block-smb",
+        "test":  "preflight_block_smb_build",
+        "expected":  "BLOCK",
+        "actual":  "BLOCK",
+        "pass":  true
+    },
+    {
+        "testId":  "test-pf-block-destructive",
+        "test":  "preflight_block_destructive",
+        "expected":  "BLOCK",
+        "actual":  "BLOCK",
+        "pass":  true
+    },
+    {
+        "testId":  "test-classify-syntax",
+        "test":  "classify_syntax_error",
+        "expected":  "syntax_error",
+        "actual":  "syntax_error",
+        "pass":  true
+    }
+]

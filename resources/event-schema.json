@@ -1,0 +1,29 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CommandGovernanceEvent",
+  "type": "object",
+  "required": ["eventId", "timestamp", "eventType", "commandFingerprint", "redactedCommand"],
+  "properties": {
+    "eventId": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "eventType": { "type": "string", "enum": ["command", "error", "validation", "installation"] },
+    "project": { "type": "string" },
+    "workspace": { "type": "string" },
+    "workingDirectory": { "type": "string" },
+    "shell": { "type": "string" },
+    "shellVersion": { "type": "string" },
+    "commandFingerprint": { "type": "string" },
+    "redactedCommand": { "type": "string" },
+    "exitCode": { "type": ["integer", "null"] },
+    "stdoutRedacted": { "type": "string" },
+    "stderrRedacted": { "type": "string" },
+    "category": { "type": "string" },
+    "cause": { "type": "string" },
+    "alternativeFound": { "type": "string" },
+    "recommendedRemedy": { "type": "string" },
+    "remedyApplied": { "type": "string" },
+    "remedyVerified": { "type": "boolean" },
+    "repeatedCount": { "type": "integer", "minimum": 1 },
+    "status": { "type": "string", "enum": ["observed", "remedied", "blocked", "verified"] }
+  }
+}

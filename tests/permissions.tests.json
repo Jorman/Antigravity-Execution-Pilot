@@ -1,0 +1,30 @@
+﻿[
+    {
+        "testId":  "test-hook-allow",
+        "test":  "hook_pre_tool_allow",
+        "expected":  "allow",
+        "actual":  "allow",
+        "pass":  true
+    },
+    {
+        "testId":  "test-hook-deny-bash",
+        "test":  "hook_pre_tool_deny_unix_shell",
+        "expected":  "deny",
+        "actual":  "deny",
+        "pass":  true
+    },
+    {
+        "testId":  "test-hook-overwrite-grep",
+        "test":  "hook_pre_tool_overwrite_grep_to_rg",
+        "expected":  "rg -r pattern .",
+        "actual":  "rg -r pattern .",
+        "pass":  true
+    },
+    {
+        "testId":  "test-broker-execution",
+        "test":  "safe_command_broker_execution",
+        "expected":  "True",
+        "actual":  "True",
+        "pass":  true
+    }
+]

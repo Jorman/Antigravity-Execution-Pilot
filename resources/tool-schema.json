@@ -1,0 +1,11 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ToolRegistrySchema",
+  "type": "object",
+  "required": ["schemaVersion", "lastScan", "tools"],
+  "properties": {
+    "schemaVersion": { "type": "integer" },
+    "lastScan": { "type": "string" },
+    "tools": { "type": "array" }
+  }
+}
