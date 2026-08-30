@@ -37,26 +37,26 @@ AI Agent decides to run a command
          ▼
 ┌─────────────────────────────────┐
 │   PreToolUse Hook (hook-pre-    │
-│   tool.ps1) intercepts every   │  ← Runs BEFORE the OS sees the command
+│   tool.ps1) intercepts every    │  ← Runs BEFORE the OS sees the command
 │   run_command call              │
 └─────────────────────────────────┘
          │
          ▼
 ┌─────────────────────────────────┐
-│   preflight-command.ps1        │
-│   Analyzes the command:        │
-│   • Dangerous? → BLOCK         │
-│   • Wrong syntax? → REWRITE    │
-│   • Missing tool? → REDIRECT   │
-│   • Safe? → ALLOW              │
+│   preflight-command.ps1         │
+│   Analyzes the command:         │
+│   • Dangerous? → BLOCK          │
+│   • Wrong syntax? → REWRITE     │
+│   • Missing tool? → REDIRECT    │
+│   • Safe? → ALLOW               │
 └─────────────────────────────────┘
          │
          ▼
 ┌─────────────────────────────────┐
-│   Anti-Loop Memory             │
-│   SHA256 fingerprint of every  │  ← Prevents the AI from looping
-│   failed command is recorded.  │
-│   Repeating it = hard BLOCK    │
+│   Anti-Loop Memory              │
+│   SHA256 fingerprint of every   │  ← Prevents the AI from looping
+│   failed command is recorded.   │
+│   Repeating it = hard BLOCK     │
 └─────────────────────────────────┘
          │
          ▼
