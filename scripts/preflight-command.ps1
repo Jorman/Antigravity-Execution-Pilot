@@ -1,4 +1,4 @@
-﻿param(
+param(
     [string]$CommandLine = "",
     [string]$WorkingDir = "j:\Progetti\AG",
     [string]$Shell = "powershell.exe",

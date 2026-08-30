@@ -1,4 +1,4 @@
-﻿---
+---
 name: agy-ep-scan
 description: Scans the current conversation for recurring error patterns (Fast, local learning)
 ---

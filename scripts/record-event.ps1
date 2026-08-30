@@ -1,4 +1,4 @@
-﻿function Record-GovernanceEvent {
+function Record-GovernanceEvent {
     param(
         [string]$EventType = "command",
         [string]$Command = "",

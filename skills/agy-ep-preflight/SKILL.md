@@ -1,4 +1,4 @@
-﻿---
+---
 name: agy-ep-preflight
 description: Use this skill to validate, analyze, rewrite, or block terminal commands before execution, ensuring syntax compatibility with Windows PowerShell and preventing dangerous operations.
 ---

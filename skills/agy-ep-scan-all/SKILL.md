@@ -1,4 +1,4 @@
-﻿---
+---
 name: agy-ep-scan-all
 description: Scans all historical conversations across all projects (Global learning, takes longer)
 ---

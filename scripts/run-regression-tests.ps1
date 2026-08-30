@@ -1,4 +1,4 @@
-﻿param(
+param(
     [string]$OutputDir = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\tests"
 )
 

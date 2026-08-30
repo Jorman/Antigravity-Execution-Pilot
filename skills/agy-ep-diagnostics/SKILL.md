@@ -1,4 +1,4 @@
-﻿---
+---
 name: agy-ep-diagnostics
 description: Use this skill to classify command failures, parse stderr/stdout, extract error categories, calculate command fingerprints, and record sanitized event logs.
 ---

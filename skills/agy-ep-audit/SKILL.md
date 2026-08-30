@@ -1,4 +1,4 @@
-﻿---
+---
 name: agy-ep-audit
 description: Audits your local environment: PATH, tools, permissions, SMB drives
 ---

@@ -1,4 +1,4 @@
-﻿---
+---
 name: agy-ep-rollback
 description: Restores rules and configuration from a backup snapshot
 ---

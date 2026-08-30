@@ -1,4 +1,4 @@
-﻿param(
+param(
     [Parameter(Mandatory=$true)]
     [string]$CommandLine,
     [string]$WorkingDir = "j:\Progetti\AG",

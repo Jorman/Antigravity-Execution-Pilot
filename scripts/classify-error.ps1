@@ -1,4 +1,4 @@
-﻿param(
+param(
     [string]$Command = "",
     [int]$ExitCode = 1,
     [string]$Stderr = "",

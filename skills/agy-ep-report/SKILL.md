@@ -1,4 +1,4 @@
-﻿---
+---
 name: agy-ep-report
 description: Generates a report of all intercepted commands in this session
 ---

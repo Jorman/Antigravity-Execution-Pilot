@@ -1,4 +1,4 @@
-﻿$ErrorActionPreference = "SilentlyContinue"
+$ErrorActionPreference = "SilentlyContinue"
 
 try {
     # Leggi payload JSON da stdin

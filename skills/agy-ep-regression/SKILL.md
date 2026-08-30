@@ -1,4 +1,4 @@
-﻿---
+---
 name: agy-ep-regression
 description: Runs the full 35-case regression test suite
 ---

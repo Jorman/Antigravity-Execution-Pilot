@@ -1,4 +1,4 @@
-﻿param(
+param(
     [string] = "C:\Users\jorma\.gemini\antigravity\brain",
     [string] = "",
     [string] = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\proposals\pending",

@@ -1,4 +1,4 @@
-﻿---
+---
 name: agy-ep-update
 description: Updates the alternative registry with newly discovered tools
 ---

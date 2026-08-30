@@ -1,4 +1,4 @@
-﻿function Redact-Secrets {
+function Redact-Secrets {
     param(
         [Parameter(Mandatory=$false)]
         [string]$Text
