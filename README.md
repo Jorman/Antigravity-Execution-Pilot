@@ -29,41 +29,27 @@ AI coding agents are predominantly trained on Linux/Bash environments. When they
 
 ---
 
-## How It Works
+## How It Works: The Two Engines
 
-```
-AI Agent decides to run a command
-         │
-         ▼
-┌─────────────────────────────────┐
-│   PreToolUse Hook (hook-pre-    │
-│   tool.ps1) intercepts every    │  ← Runs BEFORE the OS sees the command
-│   run_command call              │
-└─────────────────────────────────┘
-         │
-         ▼
-┌─────────────────────────────────┐
-│   preflight-command.ps1         │
-│   Analyzes the command:         │
-│   • Dangerous? → BLOCK          │
-│   • Wrong syntax? → REWRITE     │
-│   • Missing tool? → REDIRECT    │
-│   • Safe? → ALLOW               │
-└─────────────────────────────────┘
-         │
-         ▼
-┌─────────────────────────────────┐
-│   Anti-Loop Memory              │
-│   SHA256 fingerprint of every   │  ← Prevents the AI from looping
-│   failed command is recorded.   │
-│   Repeating it = hard BLOCK     │
-└─────────────────────────────────┘
-         │
-         ▼
-      OS executes (or not)
-```
+Antigravity Execution Pilot operates using two distinct mechanisms to work around current architectural limits (Antigravity has a PreToolUse hook to intercept commands *before* they run, but currently lacks a PostToolUse hook to natively monitor if they failed).
 
----
+### 1. The Pre-Flight Shield (100% Automatic 🟢)
+Every time the AI attempts to run a terminal command, the plugin intercepts it **before** the OS sees it.
+- Dangerous commands (mdir /s /q C:\) are instantly **blocked**.
+- Syntax errors (like using &&) are automatically **rewritten**.
+- Missing tools (like grep) are silently **redirected** to alternatives (like g).
+
+*You don't have to do anything. This happens silently and automatically on every command.*
+
+### 2. The Anti-Loop Learning System (On-Demand 🟡)
+If a completely new or safe-looking command passes the shield but fails during OS execution (e.g., git push fails due to permissions), the plugin doesn't automatically know it failed because there's no Post-Hook.
+
+This is where the **Slash Commands** come in. If you see the AI getting stuck in an error loop:
+1. You type /agy-ep-scan in the chat.
+2. The plugin scans the conversation, extracts the failed commands, calculates their SHA256 fingerprints, and adds them to the error-events.jsonl registry.
+3. From that moment on, if the AI attempts to run that *exact same command* again, the **Automatic Shield** recognizes the fingerprint and hard-blocks it, breaking the loop.
+
+**In short: It defends automatically, but it learns on command.**
 
 ## Features
 
@@ -466,3 +452,4 @@ MIT License — see [LICENSE](LICENSE) for details.
 Built for resilient AI-assisted development on Windows.<br>
 <a href="https://github.com/Jorman/Antigravity-Execution-Pilot/issues">Report a Bug</a> · <a href="https://github.com/Jorman/Antigravity-Execution-Pilot/issues">Request a Feature</a>
 </div>
+
