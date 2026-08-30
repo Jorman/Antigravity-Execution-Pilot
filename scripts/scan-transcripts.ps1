@@ -1,7 +1,8 @@
 ﻿param(
-    [string]$SearchRoot = "C:\Users\jorma\.gemini\antigravity\brain",
-    [string]$OutputDir = "C:\Users\jorma\.gemini\config\antigravity-execution-pilot\proposals\pending",
-    [int]$MinOccurrencesForProposal = 1
+    [string] = "C:\Users\jorma\.gemini\antigravity\brain",
+    [string] = "",
+    [string] = "C:\Users\jorma\.gemini\config\antigravity-execution-pilot\proposals\pending",
+    [int] = 1
 )
 
 . "C:\Users\jorma\.gemini\config\antigravity-execution-pilot\scripts\redact-secrets.ps1"
@@ -9,9 +10,19 @@
 
 $ErrorActionPreference = "SilentlyContinue"
 
-Write-Host "Scansione transcript in: $SearchRoot ..."
-
-$transcriptFiles = Get-ChildItem -Path $SearchRoot -Recurse -Filter "transcript.jsonl" -ErrorAction SilentlyContinue
+if ([string]::IsNullOrWhiteSpace()) {
+    Write-Host "Scansione globale transcript in:  ..."
+     = Get-ChildItem -Path  -Recurse -Filter "transcript.jsonl" -ErrorAction SilentlyContinue
+} else {
+    Write-Host "Scansione singola chat transcript per ID:  ..."
+     = Join-Path  "\.system_generated\logs\transcript.jsonl"
+    if (Test-Path ) {
+         = @(Get-Item )
+    } else {
+         = @()
+        Write-Host "Nessun transcript trovato per la conversazione corrente."
+    }
+}
 
 $foundErrors = @()
 $fingerprintMap = @{}
@@ -52,26 +63,26 @@ foreach ($tf in $transcriptFiles) {
                     $hashBytes = $sha256.ComputeHash($bytes)
                     $fingerprint = -join ($hashBytes | ForEach-Object { "{0:x2}" -f $_ })
 
-                    $errText = $step.content
-                    # Classifica errore
-                    $classifiedRaw = & powershell -ExecutionPolicy Bypass -File "C:\Users\jorma\.gemini\config\antigravity-execution-pilot\scripts\classify-error.ps1" -Command $cmd -Stderr $errText
-                    $classified = $classifiedRaw | ConvertFrom-Json
+                                        if (-not .ContainsKey()) {
+                         = .content
+                        # Classifica errore (processo pesante, eseguito SOLO se l'impronta e' nuova)
+                         = & powershell -ExecutionPolicy Bypass -File "C:\Users\jorma\.gemini\config\antigravity-execution-pilot\scripts\classify-error.ps1" -Command  -Stderr 
+                         =  | ConvertFrom-Json
 
-                    if (-not $fingerprintMap.ContainsKey($fingerprint)) {
-                        $fingerprintMap[$fingerprint] = @{
-                            command = $cmd
-                            category = $classified.category
-                            cause = $classified.cause
-                            alternative = $classified.alternative
-                            remedy = $classified.remedy
+                        [] = @{
+                            command = 
+                            category = .category
+                            cause = .cause
+                            alternative = .alternative
+                            remedy = .remedy
                             count = 1
-                            firstObserved = $step.created_at
-                            lastObserved = $step.created_at
-                            sampleFile = $tf.FullName
+                            firstObserved = .created_at
+                            lastObserved = .created_at
+                            sampleFile = .FullName
                         }
                     } else {
-                        $fingerprintMap[$fingerprint].count += 1
-                        $fingerprintMap[$fingerprint].lastObserved = $step.created_at
+                        [].count += 1
+                        [].lastObserved = .created_at
                     }
                 }
             }
@@ -175,4 +186,5 @@ foreach ($kp in $knownPatterns) {
     proposalsGenerated = $generatedProposals.Count
     proposals = ($generatedProposals | Select-Object proposalId, pattern, category, action)
 } | ConvertTo-Json -Depth 5
+
 

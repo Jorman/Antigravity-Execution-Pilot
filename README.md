@@ -312,12 +312,13 @@ After installation, six interactive slash commands are available in any Antigrav
 
 | Command | What it does |
 |---|---|
-| `/agy-ep-scan` | Scans the current conversation for recurring error patterns |
-| `/agy-ep-audit` | Audits your local environment: PATH, tools, permissions, SMB drives |
-| `/agy-ep-regression` | Runs the full 35-case regression test suite |
-| `/agy-ep-report` | Generates a report of all intercepted commands in this session |
-| `/agy-ep-rollback` | Restores rules and configuration from a backup snapshot |
-| `/agy-ep-update` | Updates the alternative registry with newly discovered tools |
+| /agy-ep-scan | Scans the **current conversation** for recurring error patterns (Fast, local learning) |
+| /agy-ep-scan-all | Scans **all historical conversations** across all projects (Global learning, takes longer) |
+| /agy-ep-audit | Audits your local environment: PATH, tools, permissions, SMB drives |
+| /agy-ep-regression | Runs the full 35-case regression test suite |
+| /agy-ep-report | Generates a report of all intercepted commands in this session |
+| /agy-ep-rollback | Restores rules and configuration from a backup snapshot |
+| /agy-ep-update | Updates the alternative registry with newly discovered tools |
 
 ---
 
@@ -452,4 +453,5 @@ MIT License — see [LICENSE](LICENSE) for details.
 Built for resilient AI-assisted development on Windows.<br>
 <a href="https://github.com/Jorman/Antigravity-Execution-Pilot/issues">Report a Bug</a> · <a href="https://github.com/Jorman/Antigravity-Execution-Pilot/issues">Request a Feature</a>
 </div>
+
 
