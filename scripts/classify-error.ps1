@@ -6,7 +6,7 @@ param(
     [string]$WorkingDir = "j:\Progetti\AG"
 )
 
-. "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\scripts\redact-secrets.ps1"
+. "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\redact-secrets.ps1"
 
 $combinedErr = "$Stderr `n $Stdout"
 $category = "unknown_error"

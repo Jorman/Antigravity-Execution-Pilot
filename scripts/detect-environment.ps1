@@ -1,5 +1,5 @@
 param(
-    [string]$OutputDir = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\registry"
+    [string]$OutputDir = "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\registry"
 )
 
 $ErrorActionPreference = "SilentlyContinue"
@@ -76,17 +76,17 @@ try {
 } catch {}
 
 # 6. Antigravity configuration summary
-$geminiDir = "C:\Users\jorma\.gemini"
-$configDir = "C:\Users\jorma\.gemini\config"
-$pluginsDir = "C:\Users\jorma\.gemini\config\plugins"
-$skillsDir = "C:\Users\jorma\.gemini\config\skills"
+$geminiDir = "$env:USERPROFILE\.gemini"
+$configDir = "$env:USERPROFILE\.gemini\config"
+$pluginsDir = "$env:USERPROFILE\.gemini\config\plugins"
+$skillsDir = "$env:USERPROFILE\.gemini\config\skills"
 
 $installedPlugins = if (Test-Path $pluginsDir) { (Get-ChildItem -Path $pluginsDir -Directory).Name } else { @() }
 $installedSkills = if (Test-Path $skillsDir) { (Get-ChildItem -Path $skillsDir -Directory).Name } else { @() }
 
 $antigravityInfo = [PSCustomObject]@{
     environment = "Antigravity 2.0"
-    appDataDirectory = "C:\Users\jorma\.gemini\antigravity"
+    appDataDirectory = "$env:USERPROFILE\.gemini\antigravity"
     configDirectory = $configDir
     globalRules = (Test-Path "$geminiDir\GEMINI.md")
     globalSkillsCount = $installedSkills.Count

@@ -22,7 +22,7 @@ try {
     }
 
     # Esegui pre-flight
-    $preflightScript = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\scripts\preflight-command.ps1"
+    $preflightScript = "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\preflight-command.ps1"
     $wd = if ($payload.workspacePaths -and $payload.workspacePaths.Count -gt 0) { $payload.workspacePaths[0] } else { "j:\Progetti\AG" }
     
     $pfRaw = & powershell -ExecutionPolicy Bypass -File $preflightScript -CommandLine $cmd -WorkingDir $wd

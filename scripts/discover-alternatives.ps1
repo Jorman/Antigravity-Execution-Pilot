@@ -1,5 +1,5 @@
 param(
-    [string]$OutputDir = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\registry"
+    [string]$OutputDir = "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\registry"
 )
 
 $capabilities = @(

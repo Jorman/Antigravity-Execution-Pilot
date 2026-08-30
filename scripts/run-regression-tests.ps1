@@ -1,8 +1,8 @@
 param(
-    [string]$OutputDir = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\tests"
+    [string]$OutputDir = "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\tests"
 )
 
-$baseDir = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot"
+$baseDir = "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot"
 . "$baseDir\scripts\redact-secrets.ps1"
 . "$baseDir\scripts\record-event.ps1"
 
@@ -145,7 +145,7 @@ $manifest = Get-Content "$baseDir\backups\manifest.json" -Raw | ConvertFrom-Json
 $results += Run-Case "T32-rollback-manifest" "rollback_test" "4" "$($manifest.backups.Count)" "4 backup verificati in manifest"
 
 # 33. Riavvio / persistenza Antigravity
-$pluginEnabled = (Get-Content "C:\Users\jorma\.gemini\config\config.json" -Raw | ConvertFrom-Json).plugins."antigravity-execution-pilot".enabled
+$pluginEnabled = (Get-Content "$env:USERPROFILE\.gemini\config\config.json" -Raw | ConvertFrom-Json).plugins."antigravity-execution-pilot".enabled
 $results += Run-Case "T33-antigravity-restart" "riavvio_antigravity" "True" "$pluginEnabled" "Plugin abilitato persistentemente in config.json"
 
 # 34. Tentativo bypass wrapper

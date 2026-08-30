@@ -11,10 +11,10 @@ function Record-GovernanceEvent {
         [string]$Remedy = "",
         [string]$Status = "observed",
         [string]$WorkingDir = "j:\Progetti\AG",
-        [string]$OutputDir = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\events"
+        [string]$OutputDir = "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\events"
     )
 
-    . "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\scripts\redact-secrets.ps1"
+    . "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\redact-secrets.ps1"
 
     $safeCmd = if ($null -ne $Command) { $Command } else { "" }
     $safeStdout = if ($null -ne $Stdout) { $Stdout } else { "" }

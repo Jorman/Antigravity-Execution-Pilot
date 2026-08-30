@@ -5,7 +5,7 @@ param(
     [switch]$ForceExecution
 )
 
-$baseDir = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot"
+$baseDir = "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot"
 . "$baseDir\scripts\redact-secrets.ps1"
 . "$baseDir\scripts\record-event.ps1"
 

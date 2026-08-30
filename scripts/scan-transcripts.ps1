@@ -1,25 +1,25 @@
 param(
-    [string] = "C:\Users\jorma\.gemini\antigravity\brain",
-    [string] = "",
-    [string] = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\proposals\pending",
-    [int] = 1
+    [string]$TranscriptDir = "$env:USERPROFILE\.gemini\antigravity\brain",
+    [string]$ConversationId = "",
+    [string]$OutputDir = "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\proposals\pending",
+    [int]$MinOccurrences = 1
 )
 
-. "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\scripts\redact-secrets.ps1"
-. "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\scripts\record-event.ps1"
+. "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\redact-secrets.ps1"
+. "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\record-event.ps1"
 
 $ErrorActionPreference = "SilentlyContinue"
 
-if ([string]::IsNullOrWhiteSpace()) {
-    Write-Host "Scansione globale transcript in:  ..."
-     = Get-ChildItem -Path  -Recurse -Filter "transcript.jsonl" -ErrorAction SilentlyContinue
+if ([string]::IsNullOrWhiteSpace($ConversationId)) {
+    Write-Host "Scansione globale transcript in: $TranscriptDir ..."
+    $transcriptFiles = Get-ChildItem -Path $TranscriptDir -Recurse -Filter "transcript.jsonl" -ErrorAction SilentlyContinue
 } else {
-    Write-Host "Scansione singola chat transcript per ID:  ..."
-     = Join-Path  "\.system_generated\logs\transcript.jsonl"
-    if (Test-Path ) {
-         = @(Get-Item )
+    Write-Host "Scansione singola chat transcript per ID: $ConversationId ..."
+    $targetTranscript = Join-Path $TranscriptDir "$ConversationId\.system_generated\logs\transcript.jsonl"
+    if (Test-Path $targetTranscript) {
+        $transcriptFiles = @(Get-Item $targetTranscript)
     } else {
-         = @()
+        $transcriptFiles = @()
         Write-Host "Nessun transcript trovato per la conversazione corrente."
     }
 }
@@ -35,7 +35,7 @@ foreach ($tf in $transcriptFiles) {
             $step = $line | ConvertFrom-Json
             
             # Controlla se lo step contiene un tool_call run_command con errore
-            $hasError = ($step.status -eq "ERROR" -or ($step.content -match "The command exited with code [1-9]|ParseError|SyntaxError|Termine '.*' non riconosciuto"))
+            $hasError = ($step.status -eq "ERROR" -or ($step.content -match "The command exited with code [1-9]|ParseError|SyntaxError|Termine '.*' non riconosciuto|is not recognized"))
             
             if ($hasError) {
                 # Estrai comando
@@ -63,26 +63,29 @@ foreach ($tf in $transcriptFiles) {
                     $hashBytes = $sha256.ComputeHash($bytes)
                     $fingerprint = -join ($hashBytes | ForEach-Object { "{0:x2}" -f $_ })
 
-                                        if (-not .ContainsKey()) {
-                         = .content
-                        # Classifica errore (processo pesante, eseguito SOLO se l'impronta e' nuova)
-                         = & powershell -ExecutionPolicy Bypass -File "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\scripts\classify-error.ps1" -Command  -Stderr 
-                         =  | ConvertFrom-Json
+                    if (-not $fingerprintMap.ContainsKey($fingerprint)) {
+                        $stderr = $step.content
+                        # Classifica errore
+                        $classification = & powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\classify-error.ps1" -Command $cmd -Stderr $stderr
+                        $classObj = $classification | ConvertFrom-Json
 
-                        [] = @{
-                            command = 
-                            category = .category
-                            cause = .cause
-                            alternative = .alternative
-                            remedy = .remedy
+                        $fingerprintMap[$fingerprint] = @{
+                            command = $cmd
+                            category = if ($classObj) { $classObj.category } else { "unknown_error" }
+                            cause = if ($classObj) { $classObj.cause } else { "Errore non classificato" }
+                            alternative = if ($classObj) { $classObj.alternative } else { "" }
+                            remedy = if ($classObj) { $classObj.remedy } else { "" }
                             count = 1
-                            firstObserved = .created_at
-                            lastObserved = .created_at
-                            sampleFile = .FullName
+                            firstObserved = $step.created_at
+                            lastObserved = $step.created_at
+                            sampleFile = $tf.FullName
                         }
+
+                        # Registra l'evento
+                        Record-GovernanceEvent -EventType "error" -Command $cmd -ExitCode 1 -Stderr $stderr -Category $fingerprintMap[$fingerprint].category -Cause $fingerprintMap[$fingerprint].cause -Alternative $fingerprintMap[$fingerprint].alternative -Remedy $fingerprintMap[$fingerprint].remedy -Status "observed"
                     } else {
-                        [].count += 1
-                        [].lastObserved = .created_at
+                        $fingerprintMap[$fingerprint].count += 1
+                        $fingerprintMap[$fingerprint].lastObserved = $step.created_at
                     }
                 }
             }
@@ -181,8 +184,9 @@ foreach ($kp in $knownPatterns) {
 
 # Output statistico
 [PSCustomObject]@{
-    transcriptsScanned = $transcriptFiles.Count
+    transcriptsScanned = if ($transcriptFiles) { $transcriptFiles.Count } else { 0 }
     uniqueErrorFingerprints = $fingerprintMap.Keys.Count
+    errorFingerprints = $fingerprintMap
     proposalsGenerated = $generatedProposals.Count
     proposals = ($generatedProposals | Select-Object proposalId, pattern, category, action)
 } | ConvertTo-Json -Depth 5

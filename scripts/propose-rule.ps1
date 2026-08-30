@@ -13,7 +13,7 @@ param(
     [string]$Scope = "global"
 )
 
-$baseDir = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot"
+$baseDir = "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot"
 $propId = "prop-" + [Guid]::NewGuid().ToString("N").Substring(0, 8)
 
 $propObj = [PSCustomObject]@{

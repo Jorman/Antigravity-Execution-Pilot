@@ -1,4 +1,4 @@
-﻿[
+[
     {
         "testId":  "test-hook-allow",
         "test":  "hook_pre_tool_allow",

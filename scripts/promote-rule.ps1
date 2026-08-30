@@ -4,7 +4,7 @@ param(
     [switch]$SkipRegressionTests = $false
 )
 
-$baseDir = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot"
+$baseDir = "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot"
 $propFile = "$baseDir\proposals\pending\$ProposalId.json"
 if (-not (Test-Path $propFile)) {
     # Cerca senza estensione o per match parziale

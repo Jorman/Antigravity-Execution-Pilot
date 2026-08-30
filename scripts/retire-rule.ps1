@@ -5,7 +5,7 @@ param(
     [string]$NewStatus = "retired" # retired, suspended, deprecated
 )
 
-$baseDir = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot"
+$baseDir = "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot"
 $ruleRegPath = "$baseDir\registry\rule-registry.json"
 
 if (-not (Test-Path $ruleRegPath)) {
