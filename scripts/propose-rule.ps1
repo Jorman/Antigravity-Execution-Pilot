@@ -13,7 +13,7 @@
     [string]$Scope = "global"
 )
 
-$baseDir = "C:\Users\jorma\.gemini\config\antigravity-execution-pilot"
+$baseDir = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot"
 $propId = "prop-" + [Guid]::NewGuid().ToString("N").Substring(0, 8)
 
 $propObj = [PSCustomObject]@{
@@ -43,4 +43,5 @@ $propFile = "$baseDir\proposals\pending\$propId.json"
 $propObj | ConvertTo-Json -Depth 6 | Set-Content -Path $propFile -Encoding UTF8
 
 Write-Output ($propObj | ConvertTo-Json -Depth 5)
+
 

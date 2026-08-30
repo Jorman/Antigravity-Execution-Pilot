@@ -1,12 +1,12 @@
 ﻿param(
     [string] = "C:\Users\jorma\.gemini\antigravity\brain",
     [string] = "",
-    [string] = "C:\Users\jorma\.gemini\config\antigravity-execution-pilot\proposals\pending",
+    [string] = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\proposals\pending",
     [int] = 1
 )
 
-. "C:\Users\jorma\.gemini\config\antigravity-execution-pilot\scripts\redact-secrets.ps1"
-. "C:\Users\jorma\.gemini\config\antigravity-execution-pilot\scripts\record-event.ps1"
+. "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\scripts\redact-secrets.ps1"
+. "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\scripts\record-event.ps1"
 
 $ErrorActionPreference = "SilentlyContinue"
 
@@ -66,7 +66,7 @@ foreach ($tf in $transcriptFiles) {
                                         if (-not .ContainsKey()) {
                          = .content
                         # Classifica errore (processo pesante, eseguito SOLO se l'impronta e' nuova)
-                         = & powershell -ExecutionPolicy Bypass -File "C:\Users\jorma\.gemini\config\antigravity-execution-pilot\scripts\classify-error.ps1" -Command  -Stderr 
+                         = & powershell -ExecutionPolicy Bypass -File "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\scripts\classify-error.ps1" -Command  -Stderr 
                          =  | ConvertFrom-Json
 
                         [] = @{
@@ -186,5 +186,6 @@ foreach ($kp in $knownPatterns) {
     proposalsGenerated = $generatedProposals.Count
     proposals = ($generatedProposals | Select-Object proposalId, pattern, category, action)
 } | ConvertTo-Json -Depth 5
+
 
 

@@ -22,7 +22,7 @@ try {
     }
 
     # Esegui pre-flight
-    $preflightScript = "C:\Users\jorma\.gemini\config\antigravity-execution-pilot\scripts\preflight-command.ps1"
+    $preflightScript = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\scripts\preflight-command.ps1"
     $wd = if ($payload.workspacePaths -and $payload.workspacePaths.Count -gt 0) { $payload.workspacePaths[0] } else { "j:\Progetti\AG" }
     
     $pfRaw = & powershell -ExecutionPolicy Bypass -File $preflightScript -CommandLine $cmd -WorkingDir $wd
@@ -67,4 +67,5 @@ catch {
     Write-Output ($res | ConvertTo-Json -Compress)
 }
 exit 0
+
 

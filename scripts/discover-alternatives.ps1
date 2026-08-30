@@ -1,5 +1,5 @@
 ﻿param(
-    [string]$OutputDir = "C:\Users\jorma\.gemini\config\antigravity-execution-pilot\registry"
+    [string]$OutputDir = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\registry"
 )
 
 $capabilities = @(
@@ -192,4 +192,5 @@ if (-not (Test-Path $OutputDir)) {
 $outPath = Join-Path $OutputDir "alternative-registry.json"
 $registry | ConvertTo-Json -Depth 6 | Set-Content -Path $outPath -Encoding UTF8
 Write-Output $outPath
+
 

@@ -11,10 +11,10 @@
         [string]$Remedy = "",
         [string]$Status = "observed",
         [string]$WorkingDir = "j:\Progetti\AG",
-        [string]$OutputDir = "C:\Users\jorma\.gemini\config\antigravity-execution-pilot\events"
+        [string]$OutputDir = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\events"
     )
 
-    . "C:\Users\jorma\.gemini\config\antigravity-execution-pilot\scripts\redact-secrets.ps1"
+    . "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\scripts\redact-secrets.ps1"
 
     $safeCmd = if ($null -ne $Command) { $Command } else { "" }
     $safeStdout = if ($null -ne $Stdout) { $Stdout } else { "" }
@@ -71,4 +71,5 @@
 if ($MyInvocation.InvocationName -ne '.') {
     Record-GovernanceEvent @PSBoundParameters
 }
+
 

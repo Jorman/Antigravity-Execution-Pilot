@@ -5,7 +5,7 @@
     [string]$NewStatus = "retired" # retired, suspended, deprecated
 )
 
-$baseDir = "C:\Users\jorma\.gemini\config\antigravity-execution-pilot"
+$baseDir = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot"
 $ruleRegPath = "$baseDir\registry\rule-registry.json"
 
 if (-not (Test-Path $ruleRegPath)) {
@@ -47,4 +47,5 @@ $chg = [PSCustomObject]@{
 Add-Content -Path "$baseDir\changes.jsonl" -Value $chg -Encoding UTF8
 
 Write-Output ($targetRule | ConvertTo-Json -Depth 5)
+
 

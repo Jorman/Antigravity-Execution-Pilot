@@ -5,7 +5,7 @@
     [switch]$CheckAntiRepetition = $true
 )
 
-. "C:\Users\jorma\.gemini\config\antigravity-execution-pilot\scripts\redact-secrets.ps1"
+. "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\scripts\redact-secrets.ps1"
 
 if ([string]::IsNullOrWhiteSpace($CommandLine)) {
     $out = [PSCustomObject]@{
@@ -39,7 +39,7 @@ if ($CheckAntiRepetition) {
     $hashBytes = $sha256.ComputeHash($bytes)
     $fingerprint = -join ($hashBytes | ForEach-Object { "{0:x2}" -f $_ })
 
-    $errLog = "C:\Users\jorma\.gemini\config\antigravity-execution-pilot\events\error-events.jsonl"
+    $errLog = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\events\error-events.jsonl"
     if (Test-Path $errLog) {
         $recentErrors = Get-Content -Path $errLog -ErrorAction SilentlyContinue | ForEach-Object { $_ | ConvertFrom-Json }
         $match = $recentErrors | Where-Object { $_.commandFingerprint -eq $fingerprint -and $_.status -eq "observed" }
@@ -128,5 +128,6 @@ $out = [PSCustomObject]@{
 }
 
 Write-Output ($out | ConvertTo-Json -Depth 5)
+
 
 

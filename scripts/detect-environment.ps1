@@ -1,5 +1,5 @@
 ﻿param(
-    [string]$OutputDir = "C:\Users\jorma\.gemini\config\antigravity-execution-pilot\registry"
+    [string]$OutputDir = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\registry"
 )
 
 $ErrorActionPreference = "SilentlyContinue"
@@ -132,4 +132,5 @@ $outputPath = Join-Path $OutputDir "environment-registry.json"
 $registry | ConvertTo-Json -Depth 6 | Set-Content -Path $outputPath -Encoding UTF8
 
 Write-Output $outputPath
+
 

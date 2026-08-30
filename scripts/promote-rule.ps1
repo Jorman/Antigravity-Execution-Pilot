@@ -4,7 +4,7 @@
     [switch]$SkipRegressionTests = $false
 )
 
-$baseDir = "C:\Users\jorma\.gemini\config\antigravity-execution-pilot"
+$baseDir = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot"
 $propFile = "$baseDir\proposals\pending\$ProposalId.json"
 if (-not (Test-Path $propFile)) {
     # Cerca senza estensione o per match parziale
@@ -85,4 +85,5 @@ $chg = [PSCustomObject]@{
 Add-Content -Path "$baseDir\changes.jsonl" -Value $chg -Encoding UTF8
 
 Write-Output ($ruleObj | ConvertTo-Json -Depth 5)
+
 

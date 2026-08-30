@@ -1,8 +1,8 @@
 ﻿param(
-    [string]$OutputDir = "C:\Users\jorma\.gemini\config\antigravity-execution-pilot\tests"
+    [string]$OutputDir = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\tests"
 )
 
-$baseDir = "C:\Users\jorma\.gemini\config\antigravity-execution-pilot"
+$baseDir = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot"
 . "$baseDir\scripts\redact-secrets.ps1"
 . "$baseDir\scripts\record-event.ps1"
 
@@ -167,5 +167,6 @@ $totalCount = $results.Count
     failed = ($totalCount - $passCount)
     passRate = [math]::Round(($passCount / $totalCount) * 100, 2)
 } | ConvertTo-Json
+
 
 

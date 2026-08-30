@@ -6,7 +6,7 @@
     [string]$WorkingDir = "j:\Progetti\AG"
 )
 
-. "C:\Users\jorma\.gemini\config\antigravity-execution-pilot\scripts\redact-secrets.ps1"
+. "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot\scripts\redact-secrets.ps1"
 
 $combinedErr = "$Stderr `n $Stdout"
 $category = "unknown_error"
@@ -75,4 +75,5 @@ $result = [PSCustomObject]@{
 }
 
 Write-Output ($result | ConvertTo-Json -Depth 5)
+
 

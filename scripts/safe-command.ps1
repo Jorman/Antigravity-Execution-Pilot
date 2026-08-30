@@ -5,7 +5,7 @@
     [switch]$ForceExecution
 )
 
-$baseDir = "C:\Users\jorma\.gemini\config\antigravity-execution-pilot"
+$baseDir = "C:\Users\jorma\.gemini\config\plugins\antigravity-execution-pilot"
 . "$baseDir\scripts\redact-secrets.ps1"
 . "$baseDir\scripts\record-event.ps1"
 
@@ -65,4 +65,5 @@ $outObj = [PSCustomObject]@{
     stderr = $safeStderr
 }
 Write-Output ($outObj | ConvertTo-Json -Depth 5)
+
 
