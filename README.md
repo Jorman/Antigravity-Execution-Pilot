@@ -1,6 +1,6 @@
-﻿<div align="center">
+<div align="center">
 
-# ✈️ Antigravity Execution Pilot
+# âœˆï¸ Antigravity Execution Pilot
 
 **A Windows PowerShell safety middleware for AI agents powered by Google Antigravity.**
 
@@ -25,7 +25,7 @@ AI coding agents are predominantly trained on Linux/Bash environments. When they
 | `npm run build` (on a network drive) | `Access denied` or silent failure |
 | Retrying the same failing command | Infinite loop, wasted tokens |
 
-**Antigravity Execution Pilot** is a plugin that sits between the AI's "brain" and your operating system, silently intercepting every terminal command before it runs, and either fixing it, blocking it, or redirecting it to the right tool — all automatically.
+**Antigravity Execution Pilot** is a plugin that sits between the AI's "brain" and your operating system, silently intercepting every terminal command before it runs, and either fixing it, blocking it, or redirecting it to the right tool â€” all automatically.
 
 ---
 
@@ -33,7 +33,7 @@ AI coding agents are predominantly trained on Linux/Bash environments. When they
 
 Antigravity Execution Pilot operates using two distinct mechanisms to work around current architectural limits (Antigravity has a PreToolUse hook to intercept commands *before* they run, but currently lacks a PostToolUse hook to natively monitor if they failed).
 
-### 1. The Pre-Flight Shield (100% Automatic 🟢)
+### 1. The Pre-Flight Shield (100% Automatic ðŸŸ¢)
 Every time the AI attempts to run a terminal command, the plugin intercepts it **before** the OS sees it.
 - Dangerous commands (mdir /s /q C:\) are instantly **blocked**.
 - Syntax errors (like using &&) are automatically **rewritten**.
@@ -41,7 +41,7 @@ Every time the AI attempts to run a terminal command, the plugin intercepts it *
 
 *You don't have to do anything. This happens silently and automatically on every command.*
 
-### 2. The Anti-Loop Learning System (On-Demand 🟡)
+### 2. The Anti-Loop Learning System (On-Demand ðŸŸ¡)
 If a completely new or safe-looking command passes the shield but fails during OS execution (e.g., git push fails due to permissions), the plugin doesn't automatically know it failed because there's no Post-Hook.
 
 This is where the **Slash Commands** come in. If you see the AI getting stuck in an error loop:
@@ -53,7 +53,7 @@ This is where the **Slash Commands** come in. If you see the AI getting stuck in
 
 ## Features
 
-### 🛡️ Pre-flight Interceptor
+### ðŸ›¡ï¸ Pre-flight Interceptor
 Every command is validated before hitting the OS. The interceptor catches:
 - `&&` operator (not supported in PowerShell 5.1)
 - Unix shells: `bash`, `zsh`, `sh`
@@ -62,17 +62,17 @@ Every command is validated before hitting the OS. The interceptor catches:
 - Destructive commands: `rmdir /s /q C:\Windows`, `format C:`
 - Heavy operations on SMB network drives
 
-### 🔧 Auto-Remediation (REWRITE / USE_ALTERNATIVE)
+### ðŸ”§ Auto-Remediation (REWRITE / USE_ALTERNATIVE)
 Instead of just blocking, the plugin rewrites commands on the fly:
-- `grep` → `rg` (Ripgrep, already installed)
-- `node -e "..."` → creates a temporary `.cjs` file, runs it, deletes it
-- `git add . && git commit` → rewrites to sequential steps
-- `gh pr list` → redirected to the MCP GitHub server
+- `grep` â†’ `rg` (Ripgrep, already installed)
+- `node -e "..."` â†’ creates a temporary `.cjs` file, runs it, deletes it
+- `git add . && git commit` â†’ rewrites to sequential steps
+- `gh pr list` â†’ redirected to the MCP GitHub server
 
-### 🔁 Anti-Loop Memory
+### ðŸ” Anti-Loop Memory
 When a command fails, its SHA256 fingerprint is stored in an error log. If the AI attempts to run the **exact same command again** in the same session, it is **hard-blocked** with a clear message: *"This command already failed. Try a different approach."*
 
-### 🔍 Error Classifier
+### ðŸ” Error Classifier
 `classify-error.ps1` parses `stderr`/`stdout` and maps every error to a structured category with a specific remedy:
 
 | Category | Trigger | Remedy |
@@ -86,7 +86,7 @@ When a command fails, its SHA256 fingerprint is stored in an error log. If the A
 | `timeout` | `Connection timed out` | Check connectivity |
 | `authentication_required` | `Authentication failed` | Check credentials |
 
-### 🔐 Secret Redactor
+### ðŸ” Secret Redactor
 All logged commands are automatically scrubbed of sensitive data:
 - GitHub tokens (`ghp_`, `gho_`, `ghu_`)
 - OpenAI keys (`sk-...`)
@@ -95,7 +95,7 @@ All logged commands are automatically scrubbed of sensitive data:
 - Passwords in URLs (`https://user:password@host`)
 - Parameters like `password=`, `api_key=`, `token=`
 
-### 🌍 Environment Awareness
+### ðŸŒ Environment Awareness
 On first run, the plugin scans your machine and creates a registry of:
 - PowerShell version and architecture
 - Available tools in PATH
@@ -191,7 +191,7 @@ The agent is instructed to write the code to a `.cjs` file, run `node file.cjs`,
 ```bash
 bash -c "ls -la"
 ```
-**Execution Pilot blocks it** → fingerprint recorded.
+**Execution Pilot blocks it** â†’ fingerprint recorded.
 
 **Two steps later, the AI tries again:**
 ```bash
@@ -234,19 +234,19 @@ npm run build
 - PowerShell 5.1 (built-in, no installation needed)
 - [Google Antigravity](https://antigravity.google.com) 2.0+
 
-### Step 1 — Clone the repository
+### Step 1 â€” Clone the repository
 
 ```powershell
 git clone https://github.com/Jorman/Antigravity-Execution-Pilot.git
 ```
 
-### Step 2 — Copy to Antigravity config directory
+### Step 2 â€” Copy to Antigravity config directory
 
 ```powershell
 Copy-Item -Recurse -Force ".\Antigravity-Execution-Pilot" "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot"
 ```
 
-### Step 3 — Enable the plugin in `config.json`
+### Step 3 â€” Enable the plugin in `config.json`
 
 Open `%USERPROFILE%\.gemini\config\config.json` and add the plugin entry:
 
@@ -262,11 +262,11 @@ Open `%USERPROFILE%\.gemini\config\config.json` and add the plugin entry:
 
 > If `config.json` does not exist yet, create it with the content above.
 
-### Step 4 — Restart Antigravity
+### Step 4 â€” Restart Antigravity
 
 Close and reopen Antigravity (or start a new chat). The `PreToolUse` hook will be active immediately.
 
-### Step 5 — Verify installation
+### Step 5 â€” Verify installation
 
 In a new Antigravity chat, type:
 
@@ -280,7 +280,7 @@ The plugin will scan your environment and confirm it is active.
 
 ## Moving to a New PC
 
-The plugin contains **no hardcoded usernames or paths** in its hook definition — it uses `%USERPROFILE%` which resolves automatically on any machine.
+The plugin contains **no hardcoded usernames or paths** in its hook definition â€” it uses `%USERPROFILE%` which resolves automatically on any machine.
 
 ```powershell
 # On the new machine, in PowerShell:
@@ -326,47 +326,41 @@ After installation, six interactive slash commands are available in any Antigrav
 
 ```
 antigravity-execution-pilot/
-│
-├── plugin.json              # Plugin metadata (id, name, version)
-├── hooks.json               # PreToolUse hook definition
-├── README.md                # This file
-│
-├── scripts/                 # 14 PowerShell scripts
-│   ├── hook-pre-tool.ps1        # Entry point: intercepts run_command calls
-│   ├── preflight-command.ps1    # Core engine: analyzes and rewrites commands
-│   ├── classify-error.ps1       # Maps stderr/stdout to structured error categories
-│   ├── redact-secrets.ps1       # Scrubs tokens, keys, passwords from logs
-│   ├── detect-environment.ps1   # Scans PATH, tools, filesystems, permissions
-│   ├── discover-alternatives.ps1# Builds the registry of tool alternatives
-│   ├── discover-tools.ps1       # Discovers installed tools in PATH
-│   ├── record-event.ps1         # Persists events to error-events.jsonl
-│   ├── safe-command.ps1         # Executes commands with timeout and capture
-│   ├── scan-transcripts.ps1     # Scans Antigravity chat transcripts for patterns
-│   ├── propose-rule.ps1         # Proposes a new governance rule from a failure
-│   ├── promote-rule.ps1         # Promotes a proposed rule to active status
-│   ├── retire-rule.ps1          # Retires/expires an active rule
-│   └── run-regression-tests.ps1 # Runs the full test suite
-│
-├── workflows/               # 6 slash command definitions
-│   ├── agy-ep-scan.md
-│   ├── agy-ep-audit.md
-│   ├── agy-ep-regression.md
-│   ├── agy-ep-report.md
-│   ├── agy-ep-rollback.md
-│   └── agy-ep-update.md
-│
-├── skills/                  # 7 bundled Antigravity skills
-│   ├── command-preflight/       # Pre-flight validation skill
-│   ├── command-alternatives/    # Tool discovery and substitution skill
-│   ├── command-diagnostics/     # Error classification and RCA skill
-│   ├── command-environment/     # Environment scanning skill
-│   ├── command-regression/      # Regression testing skill
-│   ├── command-maintenance/     # Backup and rollback skill
-│   └── command-learning/        # Pattern learning and rule promotion skill
-│
-└── tests/                   # Test definitions
-    ├── preflight.tests.json     # 17 preflight command tests
-    └── permissions.tests.json   # Permission and SMB tests
+â”‚
+â”œâ”€â”€ plugin.json              # Plugin metadata (id, name, version)
+â”œâ”€â”€ hooks.json               # PreToolUse hook definition
+â”œâ”€â”€ README.md                # This file
+â”‚
+â”œâ”€â”€ scripts/                 # 14 PowerShell scripts
+â”‚   â”œâ”€â”€ hook-pre-tool.ps1        # Entry point: intercepts run_command calls
+â”‚   â”œâ”€â”€ preflight-command.ps1    # Core engine: analyzes and rewrites commands
+â”‚   â”œâ”€â”€ classify-error.ps1       # Maps stderr/stdout to structured error categories
+â”‚   â”œâ”€â”€ redact-secrets.ps1       # Scrubs tokens, keys, passwords from logs
+â”‚   â”œâ”€â”€ detect-environment.ps1   # Scans PATH, tools, filesystems, permissions
+â”‚   â”œâ”€â”€ discover-alternatives.ps1# Builds the registry of tool alternatives
+â”‚   â”œâ”€â”€ discover-tools.ps1       # Discovers installed tools in PATH
+â”‚   â”œâ”€â”€ record-event.ps1         # Persists events to error-events.jsonl
+â”‚   â”œâ”€â”€ safe-command.ps1         # Executes commands with timeout and capture
+â”‚   â”œâ”€â”€ scan-transcripts.ps1     # Scans Antigravity chat transcripts for patterns
+â”‚   â”œâ”€â”€ propose-rule.ps1         # Proposes a new governance rule from a failure
+â”‚   â”œâ”€â”€ promote-rule.ps1         # Promotes a proposed rule to active status
+â”‚   â”œâ”€â”€ retire-rule.ps1          # Retires/expires an active rule
+â”‚   â””â”€â”€ run-regression-tests.ps1 # Runs the full test suite
+â”‚
+�   +-- skills/                  # 9 bundled Antigravity 2.0 skills (Slash Commands)
+�   �   +-- agy-ep-preflight/    # Pre-flight validation skill
+�   �   +-- agy-ep-update/       # Tool discovery and substitution skill
+�   �   +-- agy-ep-diagnostics/  # Error classification and RCA skill
+�   �   +-- agy-ep-audit/        # Environment scanning skill
+�   �   +-- agy-ep-regression/   # Regression testing skill
+�   �   +-- agy-ep-rollback/     # Backup and rollback skill
+�   �   +-- agy-ep-scan/         # Local Pattern learning skill
+�   �   +-- agy-ep-scan-all/     # Global Pattern learning skill
+�   �   +-- agy-ep-report/       # Session reporting skill
+�
+”â”€â”€ tests/                   # Test definitions
+    â”œâ”€â”€ preflight.tests.json     # 17 preflight command tests
+    â””â”€â”€ permissions.tests.json   # Permission and SMB tests
 ```
 
 ---
@@ -380,16 +374,16 @@ The plugin ships with a **113-test suite** split across two layers:
 Isolated ad-hoc tests that run each script in a temporary sandbox directory, covering real edge cases, boundary conditions, and failure modes:
 
 ```
-Group A: preflight-command.ps1  → 17 tests
-Group B: classify-error.ps1     → 11 tests
-Group C: redact-secrets.ps1     → 10 tests
-Group D: hook-pre-tool.ps1      →  7 tests
-Group E: detect-environment.ps1 →  8 tests
-Group F: discover-alternatives  →  5 tests
-Group G: Configuration Integrity →  6 tests
-Group H: Skills Integrity        →  4 tests
-Group I: Workflows Integrity     →  7 tests
-Group J: GEMINI.md Rules         →  3 tests
+Group A: preflight-command.ps1  â†’ 17 tests
+Group B: classify-error.ps1     â†’ 11 tests
+Group C: redact-secrets.ps1     â†’ 10 tests
+Group D: hook-pre-tool.ps1      â†’  7 tests
+Group E: detect-environment.ps1 â†’  8 tests
+Group F: discover-alternatives  â†’  5 tests
+Group G: Configuration Integrity â†’  6 tests
+Group H: Skills Integrity        â†’  4 tests
+Group I: Workflows Integrity     â†’  7 tests
+Group J: GEMINI.md Rules         â†’  3 tests
 ```
 
 **Result: 78/78 (100%)**
@@ -399,19 +393,19 @@ Group J: GEMINI.md Rules         →  3 tests
 End-to-end behavioral tests that simulate real AI agent scenarios:
 
 ```
-T01  Tool available (git) → ALLOW
-T02  Missing tool (gh) → missing_tool
-T05  grep → USE_ALTERNATIVE (rg)
-T10  bash → BLOCK
-T14  && operator → REWRITE
-T15  node -e inline → REWRITE
-T16  python -c inline → REWRITE
-T19  npm build on SMB → BLOCK
-T22  rmdir /s /q C:\Windows → BLOCK
+T01  Tool available (git) â†’ ALLOW
+T02  Missing tool (gh) â†’ missing_tool
+T05  grep â†’ USE_ALTERNATIVE (rg)
+T10  bash â†’ BLOCK
+T14  && operator â†’ REWRITE
+T15  node -e inline â†’ REWRITE
+T16  python -c inline â†’ REWRITE
+T19  npm build on SMB â†’ BLOCK
+T22  rmdir /s /q C:\Windows â†’ BLOCK
 T23  Secret redaction (token + password)
 T27  Anti-repetition (same fingerprint)
 T33  Plugin persistence after restart
-T34  Hook bypass attempt → deny
+T34  Hook bypass attempt â†’ deny
 ... and 22 more
 ```
 
@@ -431,11 +425,11 @@ powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.gemini\config\plugin
 
 ## Why is this a good plugin?
 
-1. **It fixes a structural problem, not a symptom.** AI agents trained on Linux/Bash will *always* generate Unix-style commands. This plugin doesn't try to train the AI differently — it intercepts at the execution boundary where the real damage happens.
+1. **It fixes a structural problem, not a symptom.** AI agents trained on Linux/Bash will *always* generate Unix-style commands. This plugin doesn't try to train the AI differently â€” it intercepts at the execution boundary where the real damage happens.
 
 2. **It's fully transparent.** The AI still "sees" the commands it wants to run. The plugin just quietly fixes them before the OS does. No hallucinations, no confusion.
 
-3. **It prevents token waste.** Every failed command triggers an AI retry loop. With anti-loop memory, one failure is one failure — not ten. On a complex task, this can save dozens of failed attempts.
+3. **It prevents token waste.** Every failed command triggers an AI retry loop. With anti-loop memory, one failure is one failure â€” not ten. On a complex task, this can save dozens of failed attempts.
 
 4. **It protects your data.** Destructive commands are blocked at the gate. Secrets are scrubbed from logs before they're written to disk.
 
@@ -445,13 +439,13 @@ powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.gemini\config\plugin
 
 ## License
 
-MIT License — see [LICENSE](LICENSE) for details.
+MIT License â€” see [LICENSE](LICENSE) for details.
 
 ---
 
 <div align="center">
 Built for resilient AI-assisted development on Windows.<br>
-<a href="https://github.com/Jorman/Antigravity-Execution-Pilot/issues">Report a Bug</a> · <a href="https://github.com/Jorman/Antigravity-Execution-Pilot/issues">Request a Feature</a>
+<a href="https://github.com/Jorman/Antigravity-Execution-Pilot/issues">Report a Bug</a> Â· <a href="https://github.com/Jorman/Antigravity-Execution-Pilot/issues">Request a Feature</a>
 </div>
 
 
