@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell.exe -ExecutionPolicy Bypass -File \"%USERPROFILE%\\.gemini\\config\\\\plugins\\\\antigravity-execution-pilot\\scripts\\hook-pre-tool.ps1\"",
+            "command": "powershell.exe -ExecutionPolicy Bypass -File \"%USERPROFILE%\\.gemini\\config\\plugins\\antigravity-execution-pilot\\scripts\\hook-pre-tool.ps1\"",
             "timeout": 10
           }
         ]
