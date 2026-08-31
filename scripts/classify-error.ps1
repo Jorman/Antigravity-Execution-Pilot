@@ -3,64 +3,83 @@ param(
     [int]$ExitCode = 1,
     [string]$Stderr = "",
     [string]$Stdout = "",
-    [string]$WorkingDir = "j:\Progetti\AG"
+    [string]$WorkingDir = ""
 )
+
+if ([string]::IsNullOrWhiteSpace($WorkingDir)) {
+    $WorkingDir = (Get-Location).Path
+}
 
 . "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\redact-secrets.ps1"
 
 $combinedErr = "$Stderr `n $Stdout"
 $category = "unknown_error"
-$cause = "Errore non specificato o exit code non zero"
+$cause = "Unspecified error or non-zero exit code"
 $remedy = ""
 $alternative = ""
 
 if ($combinedErr -match "(& era imprevisto|The token '&&' is not a valid statement separator)") {
     $category = "syntax_error"
-    $cause = "Operatore '&&' non supportato come connettore logico in Windows PowerShell 5.1"
-    $remedy = "Eseguire i comandi separatamente in step sequenziali distinti"
+    $cause = "Operator '&&' is not supported as a statement separator in Windows PowerShell 5.1"
+    $remedy = "Execute commands separately in distinct sequential steps"
 }
 elseif ($combinedErr -match "Termine 'grep' non riconosciuto|'grep' is not recognized") {
     $category = "missing_tool"
-    $cause = "Il comando 'grep' e' un tool Unix e non e' installato nel PATH Windows"
+    $cause = "'grep' is a Unix utility and is not installed in the Windows PATH"
     $alternative = "rg"
-    $remedy = "Utilizzare 'rg' (Ripgrep installato) oppure 'Select-String' o il tool Antigravity grep_search"
+    $remedy = "Use 'rg' (Ripgrep installed), 'Select-String', or Antigravity's grep_search tool"
 }
 elseif ($combinedErr -match "Termine 'gh' non riconosciuto|'gh' is not recognized") {
     $category = "missing_tool"
-    $cause = "GitHub CLI ('gh') non e' installato nel PATH della macchina"
+    $cause = "GitHub CLI ('gh') is not installed in the machine PATH"
     $alternative = "mcp_github"
-    $remedy = "Utilizzare il server MCP github o comandi git diretti"
+    $remedy = "Use the GitHub MCP server or direct git commands"
 }
 elseif ($combinedErr -match "Termine '(bash|zsh|sh)' non riconosciuto|execvpe\(/bin/bash\) failed") {
     $category = "wrong_shell"
-    $cause = "Shell Unix richiesta ma non disponibile o non configurata su Windows"
-    $remedy = "Convertire il comando in sintassi PowerShell o script Node/Python"
+    $cause = "Unix shell requested but not available or configured on Windows"
+    $remedy = "Convert the command to PowerShell syntax or a Node/Python script"
+}
+elseif ($combinedErr -match "Termine '([^']+)' non riconosciuto|The term '([^']+)' is not recognized|'([^']+)' is not recognized") {
+    $category = "missing_tool"
+    $missingToolName = if ($matches[1]) { $matches[1] } elseif ($matches[2]) { $matches[2] } else { $matches[3] }
+    $cause = "Tool '$missingToolName' is not installed or not found in the Windows PATH"
+    $remedy = "Verify tool installation, check PATH environment, or use an equivalent alternative"
 }
 elseif ($combinedErr -match "SyntaxError: (Invalid or unexpected token|Unexpected identifier)|ParserError:") {
     $category = "quoting_error"
-    $cause = "Escaping virgolette o stringa multiriga non compatibile con PowerShell"
-    $remedy = "Creare un file script temporaneo (.cjs, .py o .ps1) ed eseguirlo senza virgolette inline"
+    $cause = "Quotation escaping or multiline string is incompatible with PowerShell"
+    $remedy = "Create a temporary script file (.cjs, .py, or .ps1) and execute it without inline quotes"
 }
 elseif ($combinedErr -match "Accesso negato|UnauthorizedAccessException") {
-    if ($WorkingDir -match "^[Jj]:") {
+    $isNet = $false
+    if ($WorkingDir -match '^\\\\') {
+        $isNet = $true
+    } elseif ($WorkingDir -match '^([A-Za-z]):') {
+        $dl = $matches[1]
+        $drv = Get-PSDrive -Name $dl -PSProvider FileSystem -ErrorAction SilentlyContinue
+        if ($drv -and $drv.DisplayRoot) { $isNet = $true }
+    }
+
+    if ($isNet) {
         $category = "smb_error"
-        $cause = "Restrizione permessi o limitazione del filesystem sulla share di rete SMB J:\"
-        $remedy = "Usare una cartella temporanea locale per build/test o verificare credenziali SMB"
+        $cause = "Permission restriction or filesystem limitation on SMB network share ($WorkingDir)"
+        $remedy = "Use a local temporary folder (%TEMP%) for build/test operations"
     } else {
         $category = "permission_denied"
-        $cause = "Permesso di scrittura o esecuzione negato nel percorso specificato"
-        $remedy = "Verificare i permessi utente o richiedere elevazione se autorizzata"
+        $cause = "Write or execution permission denied at specified path"
+        $remedy = "Check user permissions or request elevation if authorized"
     }
 }
 elseif ($combinedErr -match "Termine '.*' non riconosciuto|is not recognized as an internal or external command") {
     $category = "missing_tool"
-    $cause = "Il comando o eseguibile invocato non e' presente nel PATH"
-    $remedy = "Verificare se il tool e' installato fuori dal PATH o utilizzare un'alternativa presente nel registro"
+    $cause = "The invoked command or executable is not present in PATH"
+    $remedy = "Verify if the tool is installed outside PATH or use an alternative from the registry"
 }
 elseif ($combinedErr -match "ETIMEDOUT|Connection timed out|TimeoutException") {
     $category = "timeout"
-    $cause = "Timeout durante l'operazione di rete o I/O"
-    $remedy = "Verificare connettivita o aumentare il timeout del comando"
+    $cause = "Timeout occurred during network or I/O operation"
+    $remedy = "Verify network connectivity or increase command timeout"
 }
 
 $result = [PSCustomObject]@{

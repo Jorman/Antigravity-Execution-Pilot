@@ -1,10 +1,10 @@
 $ErrorActionPreference = "SilentlyContinue"
 
 try {
-    # Leggi payload JSON da stdin
+    # Read JSON payload from stdin
     $inputJson = [Console]::In.ReadToEnd()
     if ([string]::IsNullOrWhiteSpace($inputJson)) {
-        # Fallback sicuro se stdin e' vuoto
+        # Safe fallback if stdin is empty
         $res = [PSCustomObject]@{ decision = "allow" }
         Write-Output ($res | ConvertTo-Json -Compress)
         exit 0
@@ -14,16 +14,16 @@ try {
     $toolName = $payload.toolCall.name
     $cmd = $payload.toolCall.args.CommandLine
 
-    # Se non e' run_command, consenti direttamente
+    # If not run_command, allow directly
     if ($toolName -ne "run_command" -or [string]::IsNullOrWhiteSpace($cmd)) {
         $res = [PSCustomObject]@{ decision = "allow" }
         Write-Output ($res | ConvertTo-Json -Compress)
         exit 0
     }
 
-    # Esegui pre-flight
+    # Execute pre-flight check
     $preflightScript = "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\preflight-command.ps1"
-    $wd = if ($payload.workspacePaths -and $payload.workspacePaths.Count -gt 0) { $payload.workspacePaths[0] } else { "j:\Progetti\AG" }
+    $wd = if ($payload.workspacePaths -and $payload.workspacePaths.Count -gt 0) { $payload.workspacePaths[0] } else { (Get-Location).Path }
     
     $pfRaw = & powershell -ExecutionPolicy Bypass -File $preflightScript -CommandLine $cmd -WorkingDir $wd
     $pf = $pfRaw | ConvertFrom-Json
@@ -31,21 +31,21 @@ try {
     if ($pf.action -eq "BLOCK") {
         $res = [PSCustomObject]@{
             decision = "deny"
-            reason = "[Command Governance] Bloccato: $($pf.motivation) - $($pf.problems -join '; ')"
+            reason = "[Command Governance] Blocked: $($pf.motivation) - $($pf.problems -join '; ')"
         }
     }
     elseif ($pf.action -eq "ASK_USER") {
         $res = [PSCustomObject]@{
             decision = "ask"
-            reason = "[Command Governance] Richiesta conferma: $($pf.motivation)"
+            reason = "[Command Governance] Confirmation required: $($pf.motivation)"
         }
     }
     elseif ($pf.action -in @("REWRITE", "USE_ALTERNATIVE")) {
-        # Se il comando e' riscritto su singola linea o compatibile
+        # If the command is rewritten on a single line or compatible
         $singleLineRewrite = ($pf.rewrittenCommand -split "`r`n")[0]
         $res = [PSCustomObject]@{
             decision = "allow"
-            reason = "[Command Governance] Comando riscritto in modo sicuro: $($pf.motivation)"
+            reason = "[Command Governance] Command safely rewritten: $($pf.motivation)"
             overwrite = [PSCustomObject]@{
                 CommandLine = $singleLineRewrite
             }
@@ -59,10 +59,10 @@ try {
     Write-Output ($res | ConvertTo-Json -Compress)
 }
 catch {
-    # In caso di errore imprevisto, non bloccare l'agente
+    # Fallback to allow on unexpected hook exception
     $res = [PSCustomObject]@{
         decision = "allow"
-        reason = "[Command Governance Warning] Errore interno hook, fallback su allow"
+        reason = "[Command Governance Warning] Internal hook error, falling back to allow"
     }
     Write-Output ($res | ConvertTo-Json -Compress)
 }

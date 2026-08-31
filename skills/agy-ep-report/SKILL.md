@@ -5,5 +5,5 @@ description: Generates a report of all intercepted commands in this session
 
 # Session Report (/agy-ep-report)
 
-Genera un report di tutte le intercettazioni e fix effettuati dal plugin nella sessione corrente.
-Controlla events/error-events.jsonl e mostra le statistiche dei blocchi e dei rewrite.
+Generates a report of all interceptions, blocks, and fixes applied by the plugin in the current session.
+Inspects `events/error-events.jsonl` and displays statistical summaries of blocks and automatic rewrites.

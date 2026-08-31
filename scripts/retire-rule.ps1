@@ -1,7 +1,7 @@
 param(
     [Parameter(Mandatory=$true)]
     [string]$RuleId,
-    [string]$Reason = "Scadenza naturale o contesto mutato",
+    [string]$Reason = "Natural expiration or changed context",
     [string]$NewStatus = "retired" # retired, suspended, deprecated
 )
 
@@ -9,7 +9,7 @@ $baseDir = "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot"
 $ruleRegPath = "$baseDir\registry\rule-registry.json"
 
 if (-not (Test-Path $ruleRegPath)) {
-    Write-Error "rule-registry.json non presente"
+    Write-Error "rule-registry.json not found"
     return $null
 }
 
@@ -17,7 +17,7 @@ $ruleReg = Get-Content -Path $ruleRegPath -Raw | ConvertFrom-Json
 $targetRule = $ruleReg.rules | Where-Object { $_.ruleId -eq $RuleId }
 
 if (-not $targetRule) {
-    Write-Error "Regola $RuleId non trovata nel registro"
+    Write-Error "Rule $RuleId not found in registry"
     return $null
 }
 
@@ -27,7 +27,7 @@ $ruleReg.lastScan = (Get-Date -Format "o")
 
 $ruleReg | ConvertTo-Json -Depth 6 | Set-Content -Path $ruleRegPath -Encoding UTF8
 
-# Sposta in proposals/retired/ se presente
+# Move to proposals/retired/ if present
 $acceptedFile = Get-ChildItem -Path "$baseDir\proposals\accepted" -Filter "*$($RuleId -replace '^rule-', '')*.json" -ErrorAction SilentlyContinue | Select-Object -First 1
 if ($acceptedFile) {
     $retiredFile = "$baseDir\proposals\retired\$($acceptedFile.Name)"

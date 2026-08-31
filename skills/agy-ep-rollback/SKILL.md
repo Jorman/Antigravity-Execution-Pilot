@@ -13,7 +13,7 @@ Use this skill for state maintenance, backup audits, and rollback procedures.
 - To clean up expired provisional rules.
 
 ## Rollback Procedure
-1. Check `~/.gemini/config/antigravity-execution-pilot/backups/manifest.json`.
+1. Check `$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\backups\manifest.json`.
 2. Verify SHA256 checksums of backup files.
 3. Restore original files and validate restored state.
 

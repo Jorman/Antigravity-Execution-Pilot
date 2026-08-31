@@ -19,5 +19,5 @@ Use this skill to perform pre-execution safety and syntax checks.
 - `ASK_USER`: High-impact or ambiguous command requiring confirmation.
 
 ## Execution
-Run: `powershell -ExecutionPolicy Bypass -File C:\Users\jorma\.gemini\config\antigravity-execution-pilot\scripts\preflight-command.ps1 -CommandLine "<command>"`
+Run: `powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\preflight-command.ps1" -CommandLine "<command>"`
 

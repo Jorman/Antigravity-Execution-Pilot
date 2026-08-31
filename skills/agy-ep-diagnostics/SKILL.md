@@ -15,5 +15,5 @@ Use this skill to diagnose and classify failed commands.
 `syntax_error`, `quoting_error`, `missing_tool`, `wrong_shell`, `permission_denied`, `smb_error`, `timeout`, `destructive_operation`, `unknown_error`.
 
 ## Execution
-Run: `powershell -ExecutionPolicy Bypass -File C:\Users\jorma\.gemini\config\antigravity-execution-pilot\scripts\classify-error.ps1 -Command "<cmd>" -ExitCode <code> -Stderr "<err>"`
+Run: `powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\classify-error.ps1" -Command "<cmd>" -ExitCode <code> -Stderr "<err>"`
 

@@ -1,9 +1,13 @@
 param(
     [Parameter(Mandatory=$true)]
     [string]$CommandLine,
-    [string]$WorkingDir = "j:\Progetti\AG",
+    [string]$WorkingDir = "",
     [switch]$ForceExecution
 )
+
+if ([string]::IsNullOrWhiteSpace($WorkingDir)) {
+    $WorkingDir = (Get-Location).Path
+}
 
 $baseDir = "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot"
 . "$baseDir\scripts\redact-secrets.ps1"
@@ -30,7 +34,7 @@ if ($pf.action -eq "BLOCK" -and -not $ForceExecution) {
 
 $effectiveCmd = if ($pf.action -in @("REWRITE", "USE_ALTERNATIVE")) { $pf.rewrittenCommand } else { $CommandLine }
 
-# 2. Esecuzione
+# 2. Execution
 $startInfo = New-Object System.Diagnostics.ProcessStartInfo
 $startInfo.FileName = "powershell.exe"
 $startInfo.Arguments = "-NoProfile -ExecutionPolicy Bypass -Command `"$effectiveCmd`""
@@ -52,7 +56,7 @@ $exitCode = $process.ExitCode
 $safeStdout = if ($stdout) { $stdout.Trim() } else { "" }
 $safeStderr = if ($stderr) { $stderr.Trim() } else { "" }
 
-# 3. Registrazione evento pulita via dot-sourcing
+# 3. Event registration via dot-sourcing
 $evtType = if ($exitCode -eq 0) { "command" } else { "error" }
 $recorded = Record-GovernanceEvent -EventType $evtType -Command $CommandLine -ExitCode $exitCode -Stdout $safeStdout -Stderr $safeStderr -WorkingDir $WorkingDir
 

@@ -11,16 +11,16 @@ if (-not (Test-Path $propFile)) {
     $found = Get-ChildItem -Path "$baseDir\proposals\pending" -Filter "*$ProposalId*.json" | Select-Object -First 1
     if ($found) { $propFile = $found.FullName }
     else {
-        Write-Error "Proposta $ProposalId non trovata in proposals/pending/"
+        Write-Error "Proposal $ProposalId not found in proposals/pending/"
         return $null
     }
 }
 
 $prop = Get-Content -Path $propFile -Raw | ConvertFrom-Json
 
-# Esegui test di regressione prima di promuovere
+# Run regression tests before promoting
 if (-not $SkipRegressionTests) {
-    Write-Host "Esecuzione test di regressione per la regola $($prop.proposalId)..."
+    Write-Host "Running regression tests for rule $($prop.proposalId)..."
 }
 
 # Sposta proposta in proposals/accepted/

@@ -14,8 +14,8 @@ Use this skill to inspect and verify the execution environment.
 
 ## Procedure
 1. Run `detect-environment.ps1`:
-   `powershell -ExecutionPolicy Bypass -File C:\Users\jorma\.gemini\config\antigravity-execution-pilot\scripts\detect-environment.ps1`
-2. Inspect the output registry in `~/.gemini/config/antigravity-execution-pilot/registry/environment-registry.json`.
+   `powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\detect-environment.ps1"`
+2. Inspect the output registry in `$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\registry\environment-registry.json`.
 3. Check filesystem capabilities and permission grants before planning heavy disk I/O.
 
 

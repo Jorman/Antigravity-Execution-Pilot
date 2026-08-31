@@ -34,7 +34,7 @@ function Redact-Secrets {
     return $sanitized
 }
 
-# Se eseguito direttamente come script da CLI
+# If executed directly as CLI script
 if ($MyInvocation.InvocationName -ne '.') {
     if ($args.Count -gt 0) {
         Redact-Secrets -Text ($args -join " ")

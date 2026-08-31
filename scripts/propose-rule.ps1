@@ -39,7 +39,12 @@ $propObj = [PSCustomObject]@{
     rollbackAvailable = $true
 }
 
-$propFile = "$baseDir\proposals\pending\$propId.json"
+$pendingDir = "$baseDir\proposals\pending"
+if (-not (Test-Path $pendingDir)) {
+    New-Item -ItemType Directory -Path $pendingDir -Force | Out-Null
+}
+
+$propFile = "$pendingDir\$propId.json"
 $propObj | ConvertTo-Json -Depth 6 | Set-Content -Path $propFile -Encoding UTF8
 
 Write-Output ($propObj | ConvertTo-Json -Depth 5)

@@ -10,9 +10,13 @@ function Record-GovernanceEvent {
         [string]$Alternative = "",
         [string]$Remedy = "",
         [string]$Status = "observed",
-        [string]$WorkingDir = "j:\Progetti\AG",
+        [string]$WorkingDir = "",
         [string]$OutputDir = "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\events"
     )
+
+    if ([string]::IsNullOrWhiteSpace($WorkingDir)) {
+        $WorkingDir = (Get-Location).Path
+    }
 
     . "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\redact-secrets.ps1"
 
@@ -37,7 +41,7 @@ function Record-GovernanceEvent {
         timestamp = (Get-Date -Format "o")
         eventType = $EventType
         project = "antigravity-execution-pilot"
-        workspace = "j:\Progetti\AG"
+        workspace = $WorkingDir
         workingDirectory = $WorkingDir
         shell = "powershell.exe"
         shellVersion = $PSVersionTable.PSVersion.ToString()
@@ -67,7 +71,7 @@ function Record-GovernanceEvent {
     return $jsonLine
 }
 
-# Invocazione da CLI se chiamato con parametri
+# CLI invocation if called with parameters
 if ($MyInvocation.InvocationName -ne '.') {
     Record-GovernanceEvent @PSBoundParameters
 }

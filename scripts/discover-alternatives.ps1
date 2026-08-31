@@ -5,7 +5,7 @@ param(
 $capabilities = @(
     [PSCustomObject]@{
         capability = "recursive_text_search"
-        description = "Ricerca di testo o pattern all'interno di file e directory ricorsivamente"
+        description = "Search text or patterns recursively across files and directories"
         primary = "rg"
         alternatives = @(
             [PSCustomObject]@{
@@ -21,7 +21,7 @@ $capabilities = @(
                 type = "powershell_cmdlet"
                 status = "verified"
                 equivalence = "full"
-                limitations = @("Sintassi PowerShell (-Path, -Pattern)")
+                limitations = @("PowerShell syntax (-Path, -Pattern)")
                 confidence = 0.95
             },
             [PSCustomObject]@{
@@ -29,7 +29,7 @@ $capabilities = @(
                 type = "antigravity_builtin_tool"
                 status = "verified"
                 equivalence = "full"
-                limitations = @("Disponibile solo all'interno dell'agente")
+                limitations = @("Available only within agent context")
                 confidence = 1.0
             },
             [PSCustomObject]@{
@@ -37,7 +37,7 @@ $capabilities = @(
                 type = "unix_tool"
                 status = "missing_replaced"
                 equivalence = "not_available"
-                limitations = @("Non installato; sostituito da rg o Select-String")
+                limitations = @("Not installed; replaced by rg or Select-String")
                 confidence = 0.0
             }
         )
@@ -46,7 +46,7 @@ $capabilities = @(
     },
     [PSCustomObject]@{
         capability = "file_search_by_name"
-        description = "Ricerca di file per nome o glob pattern"
+        description = "Search files by name or glob pattern"
         primary = "find_by_name"
         alternatives = @(
             [PSCustomObject]@{
@@ -71,7 +71,7 @@ $capabilities = @(
     },
     [PSCustomObject]@{
         capability = "github_operations"
-        description = "Operazioni GitHub (issue, pull request, reviews, commits)"
+        description = "GitHub operations (issues, pull requests, reviews, commits)"
         primary = "mcp_github"
         alternatives = @(
             [PSCustomObject]@{
@@ -79,7 +79,7 @@ $capabilities = @(
                 type = "mcp_server"
                 status = "verified"
                 equivalence = "full"
-                limitations = @("Disponibile tramite MCP server github")
+                limitations = @("Available via MCP github server")
                 confidence = 1.0
             },
             [PSCustomObject]@{
@@ -87,7 +87,7 @@ $capabilities = @(
                 type = "native_executable"
                 status = "verified"
                 equivalence = "partial"
-                limitations = @("Solo operazioni VCS locali/remote standard (commit, push, pull)")
+                limitations = @("Standard local/remote VCS operations only (commit, push, pull)")
                 confidence = 0.9
             },
             [PSCustomObject]@{
@@ -95,7 +95,7 @@ $capabilities = @(
                 type = "cli_tool"
                 status = "missing_replaced"
                 equivalence = "not_available"
-                limitations = @("Non installato; sostituito da MCP github")
+                limitations = @("Not installed; replaced by MCP github")
                 confidence = 0.0
             }
         )
@@ -104,7 +104,7 @@ $capabilities = @(
     },
     [PSCustomObject]@{
         capability = "node_script_execution"
-        description = "Esecuzione di script Node.js complessi o multiriga"
+        description = "Execution of complex or multiline Node.js scripts"
         primary = "temp_cjs_script"
         alternatives = @(
             [PSCustomObject]@{
@@ -112,7 +112,7 @@ $capabilities = @(
                 type = "pattern_rule"
                 status = "verified"
                 equivalence = "full"
-                limitations = @("Richiede creazione file .cjs temporaneo ed eliminazione post-esecuzione")
+                limitations = @("Requires creating temporary .cjs file and deleting post-execution")
                 confidence = 1.0
             },
             [PSCustomObject]@{
@@ -120,7 +120,7 @@ $capabilities = @(
                 type = "inline_eval"
                 status = "disallowed_windows"
                 equivalence = "unreliable"
-                limitations = @("Vietato su PowerShell per quote escaping fragile e SyntaxError")
+                limitations = @("Prohibited on PowerShell due to fragile quote escaping and SyntaxError")
                 confidence = 0.0
             }
         )
@@ -129,7 +129,7 @@ $capabilities = @(
     },
     [PSCustomObject]@{
         capability = "python_script_execution"
-        description = "Esecuzione di script Python complessi o multiriga"
+        description = "Execution of complex or multiline Python scripts"
         primary = "temp_py_script"
         alternatives = @(
             [PSCustomObject]@{
@@ -137,7 +137,7 @@ $capabilities = @(
                 type = "pattern_rule"
                 status = "verified"
                 equivalence = "full"
-                limitations = @("Richiede creazione file .py temporaneo ed eliminazione post-esecuzione")
+                limitations = @("Requires creating temporary .py file and deleting post-execution")
                 confidence = 1.0
             },
             [PSCustomObject]@{
@@ -145,7 +145,7 @@ $capabilities = @(
                 type = "inline_eval"
                 status = "disallowed_windows"
                 equivalence = "unreliable"
-                limitations = @("Vietato per quote escaping fragile")
+                limitations = @("Prohibited on PowerShell due to fragile quote escaping")
                 confidence = 0.0
             }
         )
@@ -154,7 +154,7 @@ $capabilities = @(
     },
     [PSCustomObject]@{
         capability = "command_chaining"
-        description = "Concatenazione di comandi successivi"
+        description = "Chaining successive commands"
         primary = "separate_execution_steps"
         alternatives = @(
             [PSCustomObject]@{
@@ -162,7 +162,7 @@ $capabilities = @(
                 type = "pattern_rule"
                 status = "verified"
                 equivalence = "full"
-                limitations = @("Eseguire ogni comando in step separati verificando l'exit code")
+                limitations = @("Execute each command in separate steps verifying exit code")
                 confidence = 1.0
             },
             [PSCustomObject]@{
@@ -170,7 +170,7 @@ $capabilities = @(
                 type = "bash_operator"
                 status = "disallowed_windows_ps5"
                 equivalence = "unsupported"
-                limitations = @("Genera ParseError in PowerShell 5.1")
+                limitations = @("Generates ParseError in PowerShell 5.1")
                 confidence = 0.0
             }
         )

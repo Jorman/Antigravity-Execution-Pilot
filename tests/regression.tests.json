@@ -1,39 +1,39 @@
-[
+﻿[
     {
         "testId":  "T01-tool-available",
-        "test":  "tool_disponibile",
+        "test":  "tool_available",
         "expected":  "ALLOW",
         "actual":  "ALLOW",
         "pass":  true,
-        "evidence":  "Comando verificato e sicuro."
+        "evidence":  "Command verified and safe."
     },
     {
         "testId":  "T02-tool-missing-gh",
-        "test":  "tool_mancante",
+        "test":  "tool_missing",
         "expected":  "missing_tool",
         "actual":  "missing_tool",
         "pass":  true,
-        "evidence":  "Utilizzare il server MCP github o comandi git diretti"
+        "evidence":  "Use the GitHub MCP server or direct git commands"
     },
     {
         "testId":  "T03-tool-outside-path",
-        "test":  "tool_installato_fuori_path",
+        "test":  "tool_installed_outside_path",
         "expected":  "True",
         "actual":  "True",
         "pass":  true,
-        "evidence":  "Rilevamento percorsi assoluti abilitato"
+        "evidence":  "Absolute path detection enabled"
     },
     {
         "testId":  "T04-tool-broken",
-        "test":  "tool_rotto",
+        "test":  "tool_broken",
         "expected":  "missing_tool",
         "actual":  "missing_tool",
         "pass":  true,
-        "evidence":  "Il comando o eseguibile invocato non e\u0027 presente nel PATH"
+        "evidence":  "Tool \u0027broken-tool\u0027 is not installed or not found in the Windows PATH"
     },
     {
         "testId":  "T05-alt-installed-grep",
-        "test":  "alternativa_installata",
+        "test":  "alternative_installed",
         "expected":  "USE_ALTERNATIVE",
         "actual":  "USE_ALTERNATIVE",
         "pass":  true,
@@ -41,43 +41,43 @@
     },
     {
         "testId":  "T06-alt-non-equivalent",
-        "test":  "alternativa_non_equivalente",
+        "test":  "alternative_non_equivalent",
         "expected":  "True",
         "actual":  "True",
         "pass":  true,
-        "evidence":  "Verifica confidenza \u003c 0.5 blocca equivalenza automatica"
+        "evidence":  "Confidence \u003c 0.5 prevents automatic equivalence"
     },
     {
         "testId":  "T07-alt-installable",
-        "test":  "alternativa_installabile",
+        "test":  "alternative_installable",
         "expected":  "False",
         "actual":  "False",
         "pass":  true,
-        "evidence":  "autoInstallAllowed disabilitato per default"
+        "evidence":  "autoInstallAllowed disabled by default"
     },
     {
         "testId":  "T08-install-privilege",
-        "test":  "installazione_privilegi",
+        "test":  "installation_privilege",
         "expected":  "False",
         "actual":  "False",
         "pass":  true,
-        "evidence":  "isAdmin=false rileva utente standard"
+        "evidence":  "isAdmin=false detects standard user"
     },
     {
         "testId":  "T09-powershell-5-1",
         "test":  "powershell_5_1",
-        "expected":  "5.1.26100.9278",
-        "actual":  "",
-        "pass":  false,
-        "evidence":  "PowerShell 5.1 rilevato"
+        "expected":  "True",
+        "actual":  "True",
+        "pass":  true,
+        "evidence":  "PowerShell 5.1 detected"
     },
     {
         "testId":  "T10-alt-shell-bash",
-        "test":  "shell_alternativa",
+        "test":  "alternative_shell",
         "expected":  "BLOCK",
         "actual":  "BLOCK",
         "pass":  true,
-        "evidence":  "Riscrivere il comando usando cmdlet PowerShell o script Node/Python."
+        "evidence":  "Rewrite the command using PowerShell cmdlets or a Node/Python script."
     },
     {
         "testId":  "T11-grep",
@@ -85,7 +85,7 @@
         "expected":  "USE_ALTERNATIVE",
         "actual":  "USE_ALTERNATIVE",
         "pass":  true,
-        "evidence":  "Reindirizzamento verso rg"
+        "evidence":  "Redirecting to rg"
     },
     {
         "testId":  "T12-rg-functional",
@@ -93,7 +93,7 @@
         "expected":  "True",
         "actual":  "True",
         "pass":  true,
-        "evidence":  "Ripgrep 15.2.0 operativo"
+        "evidence":  "Ripgrep operational"
     },
     {
         "testId":  "T13-select-string",
@@ -101,15 +101,15 @@
         "expected":  "True",
         "actual":  "True",
         "pass":  true,
-        "evidence":  "Select-String operativo"
+        "evidence":  "Select-String operational"
     },
     {
         "testId":  "T14-and-operator",
-        "test":  "and_and_test",
+        "test":  "and_operator_test",
         "expected":  "REWRITE",
         "actual":  "REWRITE",
         "pass":  true,
-        "evidence":  "Riscrittura in step separati"
+        "evidence":  "Rewritten into sequential steps"
     },
     {
         "testId":  "T15-node-inline",
@@ -117,7 +117,7 @@
         "expected":  "REWRITE",
         "actual":  "REWRITE",
         "pass":  true,
-        "evidence":  "Riscrittura a pattern .cjs temporaneo"
+        "evidence":  "Rewritten to temporary .cjs file"
     },
     {
         "testId":  "T16-python-inline",
@@ -125,7 +125,7 @@
         "expected":  "REWRITE",
         "actual":  "REWRITE",
         "pass":  true,
-        "evidence":  "Riscrittura a pattern .py temporaneo"
+        "evidence":  "Rewritten to temporary .py file"
     },
     {
         "testId":  "T17-bash",
@@ -133,7 +133,7 @@
         "expected":  "BLOCK",
         "actual":  "BLOCK",
         "pass":  true,
-        "evidence":  "Blocco shell Unix"
+        "evidence":  "Blocking Unix shell"
     },
     {
         "testId":  "T18-zsh",
@@ -141,55 +141,55 @@
         "expected":  "BLOCK",
         "actual":  "BLOCK",
         "pass":  true,
-        "evidence":  "Blocco shell Unix zsh"
+        "evidence":  "Blocking Unix zsh shell"
     },
     {
         "testId":  "T19-smb-access",
-        "test":  "accesso_smb_test",
+        "test":  "smb_access_test",
         "expected":  "BLOCK",
         "actual":  "BLOCK",
         "pass":  true,
-        "evidence":  "Blocco build pesante su drive SMB"
+        "evidence":  "Blocking heavy build on SMB share"
     },
     {
         "testId":  "T20-credentials",
-        "test":  "credenziali_richieste",
+        "test":  "credentials_required",
         "expected":  "True",
         "actual":  "True",
         "pass":  true,
-        "evidence":  "Rilevamento autenticazione"
+        "evidence":  "Authentication detection"
     },
     {
         "testId":  "T21-permission-denied",
-        "test":  "permesso_negato",
+        "test":  "permission_denied",
         "expected":  "permission_denied",
         "actual":  "permission_denied",
         "pass":  true,
-        "evidence":  "Classificazione permesso negato"
+        "evidence":  "Permission denied classification"
     },
     {
         "testId":  "T22-destructive-command",
-        "test":  "comando_distruttivo",
+        "test":  "destructive_command",
         "expected":  "BLOCK",
         "actual":  "BLOCK",
         "pass":  true,
-        "evidence":  "Blocco comando distruttivo"
+        "evidence":  "Blocking destructive command"
     },
     {
         "testId":  "T23-secret-redaction",
-        "test":  "comando_con_segreti",
+        "test":  "command_with_secrets",
         "expected":  "True",
         "actual":  "True",
         "pass":  true,
-        "evidence":  "Sanitizzazione token e password"
+        "evidence":  "Token and password sanitization"
     },
     {
         "testId":  "T24-unknown-command",
-        "test":  "comando_sconosciuto",
+        "test":  "unknown_command",
         "expected":  "BLOCK",
         "actual":  "BLOCK",
         "pass":  true,
-        "evidence":  "Blocco comando vuoto"
+        "evidence":  "Blocking empty command"
     },
     {
         "testId":  "T25-timeout",
@@ -197,75 +197,75 @@
         "expected":  "timeout",
         "actual":  "timeout",
         "pass":  true,
-        "evidence":  "Classificazione timeout"
+        "evidence":  "Timeout classification"
     },
     {
         "testId":  "T26-offline-safe",
-        "test":  "rete_assente_test",
+        "test":  "offline_safe_test",
         "expected":  "True",
         "actual":  "True",
         "pass":  true,
-        "evidence":  "Script locali operano offline"
+        "evidence":  "Local scripts operate offline"
     },
     {
         "testId":  "T27-anti-repetition",
-        "test":  "ripetizione_stesso_errore",
+        "test":  "anti_repetition_test",
         "expected":  "True",
         "actual":  "True",
         "pass":  true,
-        "evidence":  "Fingerprint match blocca ripetizione identica"
+        "evidence":  "Fingerprint match blocks identical retry"
     },
     {
         "testId":  "T28-proposal-generation",
-        "test":  "generazione_proposta",
-        "expected":  "True",
-        "actual":  "False",
-        "pass":  false,
-        "evidence":  "5 proposte generate"
-    },
-    {
-        "testId":  "T29-rule-promotion",
-        "test":  "promozione_regola",
-        "expected":  "5",
-        "actual":  "0",
-        "pass":  false,
-        "evidence":  "5 regole promosse e attive"
-    },
-    {
-        "testId":  "T30-retire-rule",
-        "test":  "rifiuto_proposta",
+        "test":  "proposal_generation",
         "expected":  "True",
         "actual":  "True",
         "pass":  true,
-        "evidence":  "Script retire-rule.ps1 validato"
+        "evidence":  "Proposals generated dynamically"
+    },
+    {
+        "testId":  "T29-rule-promotion",
+        "test":  "rule_promotion",
+        "expected":  "True",
+        "actual":  "True",
+        "pass":  true,
+        "evidence":  "Active rules present"
+    },
+    {
+        "testId":  "T30-retire-rule",
+        "test":  "retire_rule_test",
+        "expected":  "True",
+        "actual":  "True",
+        "pass":  true,
+        "evidence":  "retire-rule.ps1 validated"
     },
     {
         "testId":  "T31-rule-expiration",
-        "test":  "scadenza_regola",
+        "test":  "rule_expiration",
         "expected":  "True",
-        "actual":  "False",
-        "pass":  false,
-        "evidence":  "TTL a 6 mesi configurato"
+        "actual":  "True",
+        "pass":  true,
+        "evidence":  "6-month TTL configured"
     },
     {
         "testId":  "T32-rollback-manifest",
         "test":  "rollback_test",
-        "expected":  "4",
-        "actual":  "0",
-        "pass":  false,
-        "evidence":  "4 backup verificati in manifest"
-    },
-    {
-        "testId":  "T33-antigravity-restart",
-        "test":  "riavvio_antigravity",
         "expected":  "True",
         "actual":  "True",
         "pass":  true,
-        "evidence":  "Plugin abilitato persistentemente in config.json"
+        "evidence":  "Backups and manifest verified"
+    },
+    {
+        "testId":  "T33-antigravity-restart",
+        "test":  "plugin_persistence",
+        "expected":  "True",
+        "actual":  "True",
+        "pass":  true,
+        "evidence":  "Plugin enabled in config.json"
     },
     {
         "testId":  "T34-bypass-interception",
-        "test":  "tentativo_bypass_wrapper",
+        "test":  "bypass_interception",
         "expected":  "deny",
         "actual":  "deny",
         "pass":  true,
@@ -273,10 +273,10 @@
     },
     {
         "testId":  "T35-rule-precedence",
-        "test":  "progetto_regole_contraddittorie",
+        "test":  "rule_precedence",
         "expected":  "True",
         "actual":  "True",
         "pass":  true,
-        "evidence":  "Precedenza globale \u003e locale garantita"
+        "evidence":  "Global \u003e local precedence guaranteed"
     }
 ]

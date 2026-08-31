@@ -1,9 +1,13 @@
 param(
     [string]$CommandLine = "",
-    [string]$WorkingDir = "j:\Progetti\AG",
+    [string]$WorkingDir = "",
     [string]$Shell = "powershell.exe",
     [switch]$CheckAntiRepetition = $true
 )
+
+if ([string]::IsNullOrWhiteSpace($WorkingDir)) {
+    $WorkingDir = (Get-Location).Path
+}
 
 . "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\redact-secrets.ps1"
 
@@ -13,10 +17,10 @@ if ([string]::IsNullOrWhiteSpace($CommandLine)) {
         action = "BLOCK"
         rewrittenCommand = ""
         category = "invalid_arguments"
-        problems = @("Comando vuoto o nullo")
+        problems = @("Empty or null command")
         needsApproval = $false
         confidence = 1.0
-        motivation = "Non e' possibile eseguire comandi vuoti."
+        motivation = "Cannot execute empty commands."
     }
     Write-Output ($out | ConvertTo-Json -Depth 5)
     return
@@ -29,9 +33,9 @@ $category = "none"
 $problems = @()
 $needsApproval = $false
 $confidence = 1.0
-$motivation = "Comando verificato e sicuro."
+$motivation = "Command verified and safe."
 
-# Anti-ripetizione
+# Anti-repetition check
 if ($CheckAntiRepetition) {
     $normCmd = $trimmed.ToLower()
     $sha256 = [System.Security.Cryptography.SHA256]::Create()
@@ -49,10 +53,10 @@ if ($CheckAntiRepetition) {
                 action = "BLOCK"
                 rewrittenCommand = ""
                 category = "repeated_failed_command"
-                problems = @("Comando gia' fallito precedentemente con fingerprint: $fingerprint")
+                problems = @("Command already failed previously with fingerprint: $fingerprint")
                 needsApproval = $true
                 confidence = 1.0
-                motivation = "DIVIETO ASSOLUTO: non e' consentito ripetere identicamente un comando fallito nella stessa sessione senza prima applicare un rimedio."
+                motivation = "STRICT GOVERNANCE: Repeating an identical failed command in the same session without applying a fix is prohibited."
             }
             Write-Output ($out | ConvertTo-Json -Depth 5)
             return
@@ -60,60 +64,70 @@ if ($CheckAntiRepetition) {
     }
 }
 
-# Controllo comandi distruttivi
+# Check for destructive commands
 if ($trimmed -match "(?i)\b(rmdir\s+/s\s+/q\s+[c-z]:\\|format\s+[c-z]:|drop\s+database|del\s+/s\s+/q\s+[c-z]:\\windows)") {
     $action = "BLOCK"
     $category = "destructive_operation"
-    $problems += "Comando potenzialmente distruttivo per il sistema"
+    $problems += "Potentially destructive system command"
     $needsApproval = $true
-    $motivation = "Comando bloccato per prevenire perdita catastrofica di dati."
+    $motivation = "Command blocked to prevent catastrophic data loss."
 }
-# Controllo &&
+# Check for && operator
 elseif ($trimmed -match "\s+&&\s+") {
     $action = "REWRITE"
     $category = "syntax_error"
-    $problems += "Operatore '&&' non supportato in Windows PowerShell 5.1"
+    $problems += "Operator '&&' is not supported in Windows PowerShell 5.1"
     $steps = $trimmed -split "\s+&&\s+"
-    $rewritten = ($steps | ForEach-Object { $_.Trim() }) -join "`r`n# poi eseguire:`r`n"
-    $motivation = "Separare i comandi concatenati con '&&' in step individuali separati."
+    $rewritten = ($steps | ForEach-Object { $_.Trim() }) -join "`r`n# then execute:`r`n"
+    $motivation = "Separate commands chained with '&&' into individual sequential steps."
 }
-# Controllo grep
+# Check for grep
 elseif ($trimmed -match "(?i)^\s*grep(\.exe)?\b") {
     $action = "USE_ALTERNATIVE"
     $category = "missing_tool"
-    $problems += "grep non e' installato nel PATH Windows"
+    $problems += "grep is not installed in the Windows PATH"
     $rewritten = $trimmed -replace "(?i)^\s*grep(\.exe)?\b", "rg"
-    $motivation = "Sostituire 'grep' con 'rg' (Ripgrep) o usare 'Select-String'."
+    $motivation = "Replace 'grep' with 'rg' (Ripgrep) or use 'Select-String'."
 }
-# Controllo node -e complesso
+# Check for complex node -e
 elseif ($trimmed -match "(?i)^\s*node(\.exe)?\s+-e\s+\S") {
     $action = "REWRITE"
     $category = "quoting_error"
-    $problems += "node -e con stringhe inline complesse genera SyntaxError su PowerShell"
-    $rewritten = "Creare file temporaneo .cjs, eseguire 'node file.cjs' e rimuovere il file"
-    $motivation = "Adottare il pattern obbligatorio file .cjs temporaneo."
+    $problems += "node -e with complex inline strings causes SyntaxError on PowerShell"
+    $rewritten = "Create a temporary .cjs file, run 'node file.cjs', and delete the file"
+    $motivation = "Adopt the mandatory temporary .cjs script file pattern."
 }
-# Controllo python -c complesso
+# Check for complex python -c
 elseif ($trimmed -match "(?i)^\s*python(\.exe)?\s+-c\s+\S") {
     $action = "REWRITE"
     $category = "quoting_error"
-    $problems += "python -c con stringhe inline complesse genera SyntaxError su PowerShell"
-    $rewritten = "Creare file temporaneo .py, eseguire 'python file.py' e rimuovere il file"
-    $motivation = "Adottare il pattern obbligatorio file .py temporaneo."
+    $problems += "python -c with complex inline strings causes SyntaxError on PowerShell"
+    $rewritten = "Create a temporary .py file, run 'python file.py', and delete the file"
+    $motivation = "Adopt the mandatory temporary .py script file pattern."
 }
-# Controllo bash/zsh/sh
+# Check for bash/zsh/sh
 elseif ($trimmed -match "(?i)^\s*(bash|zsh|sh)(\.exe)?\s+(-c\s+)?") {
     $action = "BLOCK"
     $category = "wrong_shell"
-    $problems += "Shell Unix non disponibile nativamente su Windows"
-    $motivation = "Riscrivere il comando usando cmdlet PowerShell o script Node/Python."
+    $problems += "Unix shell is not available natively on Windows"
+    $motivation = "Rewrite the command using PowerShell cmdlets or a Node/Python script."
 }
-# Controllo operazioni pesanti SMB
-elseif ($WorkingDir -match "^[Jj]:" -and $trimmed -match "(?i)\b(npm\s+(run\s+(build|lint|test)|install|ci))\b") {
-    $action = "BLOCK"
-    $category = "smb_error"
-    $problems += "Operazioni di build/lint/test/install non supportate sul drive di rete SMB J:\"
-    $motivation = "Eseguire l'operazione in una directory locale temporanea (%TEMP%) e sincronizzare i file."
+# Check for heavy operations on SMB
+elseif ($trimmed -match "(?i)\b(npm\s+(run\s+(build|lint|test)|install|ci))\b") {
+    $isNet = $false
+    if ($WorkingDir -match '^\\\\') {
+        $isNet = $true
+    } elseif ($WorkingDir -match '^([A-Za-z]):') {
+        $dl = $matches[1]
+        $drv = Get-PSDrive -Name $dl -PSProvider FileSystem -ErrorAction SilentlyContinue
+        if ($drv -and $drv.DisplayRoot) { $isNet = $true }
+    }
+    if ($isNet) {
+        $action = "BLOCK"
+        $category = "smb_error"
+        $problems += "Heavy build/lint/test/install operations are not supported on SMB network shares ($WorkingDir)"
+        $motivation = "Perform the operation in a local temporary directory (%TEMP%) and synchronize files."
+    }
 }
 
 $out = [PSCustomObject]@{

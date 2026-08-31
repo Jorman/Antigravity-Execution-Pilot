@@ -1,4 +1,5 @@
 param(
+    [string]$WorkspaceRoot = "",
     [string]$OutputDir = "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\registry"
 )
 
@@ -17,7 +18,12 @@ $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIden
 # 2. Paths
 $homePath = $env:USERPROFILE
 $tempPath = $env:TEMP
-$workspaceRoots = @("j:\Progetti\AG")
+if (-not [string]::IsNullOrWhiteSpace($WorkspaceRoot) -and (Test-Path $WorkspaceRoot)) {
+    $workspaceRoots = @($WorkspaceRoot)
+} else {
+    $loc = (Get-Location).Path
+    $workspaceRoots = @($loc)
+}
 $networkRoots = @()
 
 # 3. Filesystems
@@ -65,15 +71,18 @@ try {
     }
 } catch {}
 
-$testWsFile = Join-Path "j:\Progetti\AG" "cg_perm_test_$([Guid]::NewGuid().ToString('N')).tmp"
-try {
-    Set-Content -Path $testWsFile -Value "test" -Encoding UTF8
-    if (Test-Path $testWsFile) {
-        $permTests.canWriteWorkspace = $true
-        Remove-Item -Path $testWsFile -Force
-        $permTests.canDeleteInWorkspace = $true
-    }
-} catch {}
+$targetWs = $workspaceRoots[0]
+if (Test-Path $targetWs) {
+    $testWsFile = Join-Path $targetWs "cg_perm_test_$([Guid]::NewGuid().ToString('N')).tmp"
+    try {
+        Set-Content -Path $testWsFile -Value "test" -Encoding UTF8
+        if (Test-Path $testWsFile) {
+            $permTests.canWriteWorkspace = $true
+            Remove-Item -Path $testWsFile -Force
+            $permTests.canDeleteInWorkspace = $true
+        }
+    } catch {}
+}
 
 # 6. Antigravity configuration summary
 $geminiDir = "$env:USERPROFILE\.gemini"

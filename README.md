@@ -292,7 +292,7 @@ Copy-Item -Recurse -Force ".\Antigravity-Execution-Pilot" "$env:USERPROFILE\.gem
 
 The plugin state and rule registry are stored in:
 ```
-%USERPROFILE%\.gemini\config\antigravity-execution-pilot\
+%USERPROFILE%\.gemini\config\plugins\antigravity-execution-pilot\
 ```
 You can copy this folder too to preserve your learned rules and error history across machines.
 

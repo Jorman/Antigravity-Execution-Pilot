@@ -1,13 +1,13 @@
-﻿# Regole Workspace per Command Governance
+# Workspace Rules for Command Governance
 
-Queste regole si applicano al repository/progetto locale:
+These rules apply to the local repository and workspace:
 
-## 1. Ambiente di Esecuzione
-- Stack tecnologico: Node.js / Python / Git.
-- Shell supportata: Windows PowerShell.
-- Percorso workspace: verificare se locale (C:\) o su share di rete SMB (J:\).
+## 1. Execution Environment
+- Technology stack: Node.js / Python / Git.
+- Supported shell: Windows PowerShell.
+- Workspace path: verify whether local (C:\) or on an SMB network share (e.g. mapped network drives).
 
-## 2. Direttive Operative
-- Usare `rg` o `Select-String` per ricerche testuali nel progetto.
-- Eseguire i comandi di build e test esclusivamente su drive locali o cartella temporanea locale (%TEMP%) se il progetto risiede su share SMB.
-- Proteggere tutte le credenziali e API keys (redazione automatica).
+## 2. Operational Directives
+- Use `rg` or `Select-String` for text searches within the project.
+- Execute build and test commands exclusively on local drives or local temporary directories (%TEMP%) if the project resides on an SMB share.
+- Protect all credentials and API keys (automatic secret redaction).
