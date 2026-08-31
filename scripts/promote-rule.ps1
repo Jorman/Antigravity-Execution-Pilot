@@ -23,8 +23,12 @@ if (-not $SkipRegressionTests) {
     Write-Host "Running regression tests for rule $($prop.proposalId)..."
 }
 
-# Sposta proposta in proposals/accepted/
-$acceptedFile = "$baseDir\proposals\accepted\$(Split-Path $propFile -Leaf)"
+# Move proposal to proposals/accepted/
+$acceptedDir = "$baseDir\proposals\accepted"
+if (-not (Test-Path $acceptedDir)) {
+    New-Item -ItemType Directory -Path $acceptedDir -Force | Out-Null
+}
+$acceptedFile = Join-Path $acceptedDir (Split-Path $propFile -Leaf)
 Move-Item -Path $propFile -Destination $acceptedFile -Force
 
 # Carica o inizializza rule-registry.json

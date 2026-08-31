@@ -45,8 +45,13 @@ if ($CheckAntiRepetition) {
 
     $errLog = "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\events\error-events.jsonl"
     if (Test-Path $errLog) {
-        $recentErrors = Get-Content -Path $errLog -ErrorAction SilentlyContinue | ForEach-Object { $_ | ConvertFrom-Json }
-        $match = $recentErrors | Where-Object { $_.commandFingerprint -eq $fingerprint -and $_.status -eq "observed" }
+        $recentErrors = Get-Content -Path $errLog -Tail 100 -ErrorAction SilentlyContinue | ForEach-Object { $_ | ConvertFrom-Json }
+        $cutoff = (Get-Date).AddMinutes(-60)
+        $match = $recentErrors | Where-Object { 
+            $_.commandFingerprint -eq $fingerprint -and 
+            $_.status -eq "observed" -and 
+            (try { [DateTime]$_.timestamp -ge $cutoff } catch { $false })
+        }
         if ($match) {
             $out = [PSCustomObject]@{
                 originalCommand = (Redact-Secrets -Text $CommandLine)

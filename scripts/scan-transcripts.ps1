@@ -86,7 +86,7 @@ foreach ($tf in $transcriptFiles) {
                         }
 
                         # Record event
-                        Record-GovernanceEvent -EventType "error" -Command $cmd -ExitCode 1 -Stderr $stderr -Category $fingerprintMap[$fingerprint].category -Cause $fingerprintMap[$fingerprint].cause -Alternative $fingerprintMap[$fingerprint].alternative -Remedy $fingerprintMap[$fingerprint].remedy -Status "observed"
+                        Record-GovernanceEvent -EventType "error" -Command $cmd -ExitCode 1 -Stderr $stderr -Category $fingerprintMap[$fingerprint].category -Cause $fingerprintMap[$fingerprint].cause -Alternative $fingerprintMap[$fingerprint].alternative -Remedy $fingerprintMap[$fingerprint].remedy -Status "observed" -Timestamp $step.created_at
                     } else {
                         $fingerprintMap[$fingerprint].count += 1
                         $fingerprintMap[$fingerprint].lastObserved = $step.created_at

@@ -1,8 +1,12 @@
-﻿# State files (machine-specific, not for sharing)
-# Uncomment if you want to exclude local state:
-# ../antigravity-execution-pilot/events/
-# ../antigravity-execution-pilot/registry/
-# ../antigravity-execution-pilot/backups/
+# Local machine-specific runtime state (never commit to public repo)
+events/
+registry/
+proposals/
+backups/
+reports/
+checkpoints/
+*.jsonl
+*.log
 
 # Temp files
 *.tmp

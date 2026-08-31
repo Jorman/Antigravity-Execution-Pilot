@@ -11,12 +11,15 @@ function Record-GovernanceEvent {
         [string]$Remedy = "",
         [string]$Status = "observed",
         [string]$WorkingDir = "",
+        [string]$Timestamp = "",
         [string]$OutputDir = "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\events"
     )
 
     if ([string]::IsNullOrWhiteSpace($WorkingDir)) {
         $WorkingDir = (Get-Location).Path
     }
+
+    $eventTime = if ([string]::IsNullOrWhiteSpace($Timestamp)) { (Get-Date -Format "o") } else { $Timestamp }
 
     . "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\redact-secrets.ps1"
 
@@ -38,7 +41,7 @@ function Record-GovernanceEvent {
 
     $eventObj = [PSCustomObject]@{
         eventId = $eventId
-        timestamp = (Get-Date -Format "o")
+        timestamp = $eventTime
         eventType = $EventType
         project = "antigravity-execution-pilot"
         workspace = $WorkingDir
