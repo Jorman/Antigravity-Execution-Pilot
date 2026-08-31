@@ -298,19 +298,317 @@ You can copy this folder too to preserve your learned rules and error history ac
 
 ---
 
-## Slash Commands
+## Slash Commands & Skills Reference
 
-After installation, the following interactive slash commands are available in any Antigravity chat:
+After installation, the following interactive slash commands and specialized skills are available in any Antigravity chat:
 
-| Command | What it does |
-|---|---|
-| `/agy-ep-scan` | Scans the **current conversation** for recurring error patterns (Fast, local learning) |
-| `/agy-ep-scan-all` | Scans **all historical conversations** across all projects (Global learning) |
-| `/agy-ep-audit` | Audits your local environment: PATH, tools, permissions, SMB drives |
-| `/agy-ep-regression` | Runs the full regression test suite |
-| `/agy-ep-report` | Generates a report of all intercepted commands in this session |
-| `/agy-ep-rollback` | Restores rules and configuration from a backup snapshot |
-| `/agy-ep-update` | Updates the alternative registry with newly discovered tools |
+| Command / Skill | Scope | Primary Purpose |
+|---|---|---|
+| [`/agy-ep-scan`](#1-agy-ep-scan-local-pattern-learning) | Session | Scans current conversation for errors and activates instant anti-loop blocking |
+| [`/agy-ep-scan-all`](#2-agy-ep-scan-all-global-pattern-learning) | Global | Scans all historical transcripts across all projects and extracts rule proposals |
+| [`promote-rule.ps1`](#rule-promotion-workflow-applying-proposals) | Workflow | Promotes pending proposals to active, permanent governance rules |
+| [`/agy-ep-audit`](#3-agy-ep-audit-environment--workspace-inspection) | Environment | Audits PATH, shell version, permissions, and local vs SMB network drives |
+| [`/agy-ep-update`](#4-agy-ep-update-tool-discovery--alternatives) | Registry | Discovers installed CLI alternatives (`rg`, `git`, `docker`, MCP servers) |
+| [`/agy-ep-preflight`](#5-agy-ep-preflight-pre-execution-command-validation) | Inspection | Validates and tests command rewriting before execution |
+| [`/agy-ep-diagnostics`](#6-agy-ep-diagnostics-error-classification--rca) | Diagnostics | Classifies stderr/stdout into 20 standardized categories with actionable remedies |
+| [`/agy-ep-regression`](#7-agy-ep-regression-full-regression-test-suite) | Testing | Executes the full 35-case end-to-end regression validation suite |
+| [`/agy-ep-report`](#8-agy-ep-report-session-interception-report) | Reporting | Generates a statistical report of all blocks and rewrites in the active session |
+| [`/agy-ep-rollback`](#9-agy-ep-rollback-rule-retirement--rollback) | Maintenance | Retires or deprecates active rules and manages backup snapshots |
+
+---
+
+### 1. `/agy-ep-scan` (Local Pattern Learning)
+
+**When to Use:**
+Trigger this command whenever you notice the AI getting stuck in an error loop during the current chat session.
+
+**How It Works:**
+1. Analyzes the active conversation transcript.
+2. Extracts failed command strings and calculates their SHA256 fingerprints.
+3. Adds them to `events/error-events.jsonl` with `status: "observed"`.
+4. Generates structured rule proposals in `proposals/pending/`.
+5. **Immediate Result:** From that moment on, if the AI attempts the exact same failing command again in this session, the **Pre-Flight Shield** hard-blocks it instantly.
+
+**Chat Invocation:**
+```
+/agy-ep-scan
+```
+
+**Terminal Invocation:**
+```powershell
+powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\scan-transcripts.ps1" -ConversationId "<YOUR_CONVERSATION_ID>"
+```
+
+**Example Output:**
+```json
+{
+  "transcriptsScanned": 1,
+  "uniqueErrorFingerprints": 2,
+  "newProposalsGenerated": 2,
+  "proposals": [
+    {
+      "proposalId": "prop-dyn-a22a43f6",
+      "pattern": "node -e 'const fs = require(\"fs\"); ...'",
+      "category": "quoting_error",
+      "action": "BLOCK"
+    }
+  ]
+}
+```
+
+---
+
+### 2. `/agy-ep-scan-all` (Global Pattern Learning)
+
+**When to Use:**
+Run this periodically or after setting up the plugin to learn globally from every past mistake made across all your projects and chat histories.
+
+**How It Works:**
+Scans all `transcript.jsonl` files in `%USERPROFILE%\.gemini\antigravity\brain\`, extracts unique command failures, classifies them against the 20 governance categories, and populates `proposals/pending/` with ready-to-promote rules.
+
+**Chat Invocation:**
+```
+/agy-ep-scan-all
+```
+
+**Terminal Invocation:**
+```powershell
+powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\scan-transcripts.ps1"
+```
+
+**Example Output:**
+```json
+{
+  "transcriptsScanned": 126,
+  "uniqueErrorFingerprints": 179,
+  "newProposalsGenerated": 179,
+  "proposals": [
+    {
+      "proposalId": "prop-dyn-3168dbd7",
+      "pattern": "node -e 'const fs = require(\"fs\"); let code = ...'",
+      "category": "quoting_error",
+      "action": "BLOCK"
+    },
+    {
+      "proposalId": "prop-dyn-d0195175",
+      "pattern": "git add .agents/survey && git commit -m \"docs: report\"",
+      "category": "syntax_error",
+      "action": "REWRITE"
+    }
+  ]
+}
+```
+
+---
+
+### 💡 Rule Promotion Workflow: Applying Proposals
+
+Once proposals are generated in `proposals/pending/`, you can promote individual proposals or batch-promote them to permanent active status in `rule-registry.json`.
+
+**Promote a Single Proposal:**
+```powershell
+powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\promote-rule.ps1" -ProposalId "prop-dyn-3168dbd7"
+```
+
+**Example Output:**
+```json
+{
+  "ruleId": "rule-dyn-3168dbd7",
+  "version": 1,
+  "scope": "global",
+  "status": "active",
+  "pattern": "node -e '...'",
+  "category": "quoting_error",
+  "action": "BLOCK",
+  "expiresAt": "2027-02-28T21:28:59Z",
+  "rollbackAvailable": true
+}
+```
+*The proposal is moved from `proposals/pending/` to `proposals/accepted/` and activated in `registry/rule-registry.json`.*
+
+---
+
+### 3. `/agy-ep-audit` (Environment & Workspace Inspection)
+
+**When to Use:**
+Run at the beginning of a project or when troubleshooting environment-specific issues (e.g. verifying whether a workspace is located on a local drive or an SMB network share, checking user elevation, or verifying tool paths).
+
+**Chat Invocation:**
+```
+/agy-ep-audit
+```
+
+**Terminal Invocation:**
+```powershell
+powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\detect-environment.ps1"
+```
+
+**Example Output:**
+```json
+{
+  "schemaVersion": 1,
+  "machine": {
+    "os": "Microsoft Windows 11 Pro",
+    "architecture": "AMD64",
+    "defaultShell": "powershell.exe",
+    "shellVersion": "5.1.26100.9278",
+    "isAdmin": false
+  },
+  "filesystems": [
+    { "name": "C", "root": "C:\\", "type": "Local", "freeGb": 240.5 },
+    { "name": "J", "root": "J:\\", "type": "Network/SMB", "uncPath": "\\\\NAS\\Projects", "freeGb": 1820.0 }
+  ],
+  "permissions": {
+    "canWriteTemp": true,
+    "canWriteWorkspace": true,
+    "canDeleteInWorkspace": true
+  }
+}
+```
+
+---
+
+### 4. `/agy-ep-update` (Tool Discovery & Alternatives)
+
+**When to Use:**
+When determining what tools are installed on the system and finding verified equivalents to avoid unnecessary package installation loops (like trying to install `grep` on Windows).
+
+**Chat Invocation:**
+```
+/agy-ep-update
+```
+
+**Terminal Invocation:**
+```powershell
+powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\discover-alternatives.ps1"
+```
+
+**Example Output:**
+```json
+{
+  "capability": "recursive_text_search",
+  "description": "Search text or patterns recursively across files and directories",
+  "primary": "rg",
+  "alternatives": [
+    { "command": "rg", "type": "native_executable", "status": "verified", "confidence": 1.0 },
+    { "command": "Select-String", "type": "powershell_cmdlet", "status": "verified", "confidence": 0.95 },
+    { "command": "grep", "type": "unix_tool", "status": "missing_replaced", "confidence": 0.0 }
+  ]
+}
+```
+
+---
+
+### 5. `/agy-ep-preflight` (Pre-Execution Command Validation)
+
+**When to Use:**
+To inspect how the pre-flight shield will interpret, modify, or block a command before executing it.
+
+**Terminal Invocation:**
+```powershell
+powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\preflight-command.ps1" -CommandLine "git add . && git commit -m 'feat: new feature'"
+```
+
+**Example Output:**
+```json
+{
+  "originalCommand": "git add . && git commit -m 'feat: new feature'",
+  "action": "REWRITE",
+  "rewrittenCommand": "git add .\r\n# then execute:\r\ngit commit -m 'feat: new feature'",
+  "category": "syntax_error",
+  "problems": [
+    "Operator '&&' is not supported in Windows PowerShell 5.1"
+  ],
+  "needsApproval": false,
+  "confidence": 1.0,
+  "motivation": "Separate commands chained with '&&' into individual sequential steps."
+}
+```
+
+---
+
+### 6. `/agy-ep-diagnostics` (Error Classification & RCA)
+
+**When to Use:**
+Immediately after a terminal command fails, to generate an instant Root Cause Analysis (RCA) with a recommended remedy.
+
+**Terminal Invocation:**
+```powershell
+powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\classify-error.ps1" -Command "grep -rn 'TODO' ." -Stderr "'grep' is not recognized as an internal or external command"
+```
+
+**Example Output:**
+```json
+{
+  "category": "missing_tool",
+  "cause": "'grep' is a Unix utility and is not installed in the Windows PATH",
+  "alternative": "rg",
+  "remedy": "Use 'rg' (Ripgrep installed), 'Select-String', or Antigravity's grep_search tool",
+  "exitCode": 1,
+  "redactedStderr": "'grep' is not recognized as an internal or external command"
+}
+```
+
+---
+
+### 7. `/agy-ep-regression` (Full Regression Test Suite)
+
+**When to Use:**
+Before promoting rules or after modifying configurations to ensure all 35 behavioral protections function with a 100% pass rate.
+
+**Chat Invocation:**
+```
+/agy-ep-regression
+```
+
+**Terminal Invocation:**
+```powershell
+powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\run-regression-tests.ps1"
+```
+
+**Example Output:**
+```json
+{
+  "totalTests": 35,
+  "passed": 35,
+  "failed": 0,
+  "passRate": 100.0
+}
+```
+
+---
+
+### 8. `/agy-ep-report` (Session Interception Report)
+
+**When to Use:**
+To inspect the governance log and see how many commands were intercepted, rewritten, or blocked during the current session.
+
+**Chat Invocation:**
+```
+/agy-ep-report
+```
+
+---
+
+### 9. `/agy-ep-rollback` (Rule Retirement & State Rollback)
+
+**When to Use:**
+When a temporary rule is no longer needed, expired, or causing conflicts, and needs to be retired.
+
+**Terminal Invocation:**
+```powershell
+powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\retire-rule.ps1" -RuleId "rule-dyn-3168dbd7" -Reason "Replaced by permanent refactor"
+```
+
+**Example Output:**
+```json
+{
+  "ruleId": "rule-dyn-3168dbd7",
+  "status": "retired",
+  "lastValidated": "2026-08-31T21:45:00Z"
+}
+```
+*The rule status is changed to `retired` in `rule-registry.json` and moved to `proposals/retired/`.*
 
 ---
 
