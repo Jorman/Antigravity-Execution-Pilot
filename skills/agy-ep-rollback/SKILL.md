@@ -1,20 +1,19 @@
 ---
 name: agy-ep-rollback
-description: Restores rules and configuration from a backup snapshot
+description: Retires or deprecates active rules and restores configuration state
 ---
 
-# Command Maintenance Skill
+# Command Maintenance & Rollback Skill
 
-Use this skill for state maintenance, backup audits, and rollback procedures.
+Use this skill for rule status management, deprecation, and rolling back rules in `rule-registry.json`.
 
 ## When to Use
-- Prior to updating configuration files or promoting new rules.
-- To execute rollbacks to a previous verified state recorded in `backups/manifest.json`.
-- To clean up expired provisional rules.
+- To retire or deprecate a specific active rule that is no longer needed.
+- To deactivate a rule or revert proposal states.
 
-## Rollback Procedure
-1. Check `$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\backups\manifest.json`.
-2. Verify SHA256 checksums of backup files.
-3. Restore original files and validate restored state.
+## Execution
+Run `retire-rule.ps1` with the Target `RuleId`:
 
-
+```powershell
+powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\retire-rule.ps1" -RuleId "<rule-id>" -Reason "<reason>" -NewStatus "retired"
+```

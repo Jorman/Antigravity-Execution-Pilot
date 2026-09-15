@@ -40,15 +40,21 @@ try {
             reason = "[Command Governance] Confirmation required: $($pf.motivation)"
         }
     }
-    elseif ($pf.action -in @("REWRITE", "USE_ALTERNATIVE")) {
-        # If the command is rewritten on a single line or compatible
-        $singleLineRewrite = ($pf.rewrittenCommand -split "`r`n")[0]
+    elseif ($pf.action -eq "USE_ALTERNATIVE" -and -not [string]::IsNullOrWhiteSpace($pf.rewrittenCommand) -and -not ($pf.rewrittenCommand -match "`r|`n")) {
+        # Single-line valid tool alternative (e.g. replacing 'grep' with 'rg')
         $res = [PSCustomObject]@{
             decision = "allow"
-            reason = "[Command Governance] Command safely rewritten: $($pf.motivation)"
+            reason = "[Command Governance] Command safely redirected to alternative tool: $($pf.motivation)"
             overwrite = [PSCustomObject]@{
-                CommandLine = $singleLineRewrite
+                CommandLine = $pf.rewrittenCommand
             }
+        }
+    }
+    elseif ($pf.action -in @("REWRITE", "USE_ALTERNATIVE")) {
+        # Complex multi-step or script rewrite required -> deny with exact guidance so agent executes properly
+        $res = [PSCustomObject]@{
+            decision = "deny"
+            reason = "[Command Governance] Rewrite Required: $($pf.motivation) Solution: $($pf.rewrittenCommand)"
         }
     }
     else {
@@ -67,5 +73,3 @@ catch {
     Write-Output ($res | ConvertTo-Json -Compress)
 }
 exit 0
-
-

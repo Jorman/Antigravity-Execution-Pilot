@@ -7,20 +7,21 @@ param(
 
 . "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\redact-secrets.ps1"
 . "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\record-event.ps1"
+. "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\classify-error.ps1"
 
 $ErrorActionPreference = "SilentlyContinue"
 
 if ([string]::IsNullOrWhiteSpace($ConversationId)) {
-    Write-Host "Global transcript scan in: $TranscriptDir ..."
+    Write-Host "Scansione globale transcript in: $TranscriptDir ..."
     $transcriptFiles = Get-ChildItem -Path $TranscriptDir -Recurse -Filter "transcript.jsonl" -ErrorAction SilentlyContinue
 } else {
-    Write-Host "Single conversation transcript scan for ID: $ConversationId ..."
+    Write-Host "Scansione singola chat transcript per ID: $ConversationId ..."
     $targetTranscript = Join-Path $TranscriptDir "$ConversationId\.system_generated\logs\transcript.jsonl"
     if (Test-Path $targetTranscript) {
         $transcriptFiles = @(Get-Item $targetTranscript)
     } else {
         $transcriptFiles = @()
-        Write-Host "No transcript found for current conversation."
+        Write-Host "Nessun transcript trovato per la conversazione corrente."
     }
 }
 
@@ -28,34 +29,32 @@ $foundErrors = @()
 $fingerprintMap = @{}
 
 foreach ($tf in $transcriptFiles) {
-    $lines = Get-Content -Path $tf.FullName -Encoding UTF8 -ErrorAction SilentlyContinue
-    $lastRunCommand = ""
+    if (-not (Test-Path $tf.FullName)) { continue }
+    
+    $lines = Get-Content $tf.FullName -ErrorAction SilentlyContinue
+    if (-not $lines) { continue }
+
     foreach ($line in $lines) {
         if ([string]::IsNullOrWhiteSpace($line)) { continue }
         try {
             $step = $line | ConvertFrom-Json
             
-            # If step contains run_command tool calls, save command
-            if ($step.tool_calls) {
-                foreach ($tc in $step.tool_calls) {
-                    if ($tc.name -eq "run_command" -and $tc.args -and $tc.args.CommandLine) {
-                        $cmdVal = $tc.args.CommandLine
-                        if ($cmdVal -is [string]) {
-                            $lastRunCommand = $cmdVal.Trim('"')
-                        }
-                    }
-                }
-            }
-            
-            # Check if step contains an execution error
-            $isErrorCode = ($step.content -match "The command exited with code [1-9]")
-            $isSyntaxErr = ($step.content -match "ParseError|SyntaxError|Termine '.*' non riconosciuto|is not recognized|Cannot find path")
-            $hasError = ($step.status -eq "ERROR" -or $isErrorCode -or $isSyntaxErr)
+            # Check if step contains failed run_command
+            $hasError = ($step.status -eq "ERROR" -or ($step.content -match "The command exited with code [1-9]|ParseError|SyntaxError|Termine '.*' non riconosciuto|is not recognized"))
             
             if ($hasError) {
-                $cmd = $lastRunCommand
+                # Extract command
+                $cmd = ""
+                if ($step.tool_calls) {
+                    $tc = $step.tool_calls | Where-Object { $_.name -eq "run_command" } | Select-Object -First 1
+                    if ($tc -and $tc.args -and $tc.args.CommandLine) {
+                        $cmd = $tc.args.CommandLine
+                    }
+                }
+                
+                # If command is missing in step, search content/thinking
                 if (-not $cmd -and $step.content) {
-                    if ($step.content -match 'CommandLine:\s*([^\r\n]+)') {
+                    if ($step.content -match 'CommandLine: ([^\r\n]+)') {
                         $cmd = $matches[1]
                     }
                 }
@@ -69,10 +68,10 @@ foreach ($tf in $transcriptFiles) {
 
                     if (-not $fingerprintMap.ContainsKey($fingerprint)) {
                         $stderr = $step.content
-                        # Classify error
-                        $classification = & powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\scripts\classify-error.ps1" -Command $cmd -Stderr $stderr
-                        $classObj = $classification | ConvertFrom-Json
-
+                        
+                        # Direct classification via function call without spawning subprocess
+                        $classObj = Classify-CommandError -Command $cmd -Stderr $stderr
+                        
                         $fingerprintMap[$fingerprint] = @{
                             command = $cmd
                             category = if ($classObj) { $classObj.category } else { "unknown_error" }
@@ -93,13 +92,13 @@ foreach ($tf in $transcriptFiles) {
                     }
                 }
             }
-        } catch {}
+        } catch {
+            Write-Verbose "Skipping invalid JSON line in $($tf.FullName): $_"
+        }
     }
 }
 
 # --- DYNAMIC PROPOSAL GENERATION ---
-# Proposals are generated dynamically from real errors observed in transcripts.
-
 if (-not (Test-Path $OutputDir)) {
     New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
 }
@@ -108,64 +107,44 @@ $acceptedDir   = "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-
 $ruleRegPath   = "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\registry\rule-registry.json"
 $activeRuleIds = @()
 if (Test-Path $ruleRegPath) {
-    $reg = Get-Content -Path $ruleRegPath -Raw | ConvertFrom-Json
-    if ($reg.rules) { $activeRuleIds = @($reg.rules | ForEach-Object { $_.ruleId }) }
+    try {
+        $reg = Get-Content $ruleRegPath -Raw | ConvertFrom-Json
+        $activeRuleIds = @($reg.rules | Where-Object { $_.status -eq 'active' } | ForEach-Object { $_.ruleId })
+    } catch {}
 }
 
 $generatedProposals = @()
-$counter = 1
 
-foreach ($fp in $fingerprintMap.GetEnumerator()) {
-    $entry = $fp.Value
-    if ($entry.count -lt $MinOccurrences) { continue }
+foreach ($fp in $fingerprintMap.Keys) {
+    $errInfo = $fingerprintMap[$fp]
+    if ($errInfo.count -ge $MinOccurrences -and $errInfo.category -ne "unknown_error") {
+        $propId = "prop-" + $fp.Substring(0, 8)
+        $propFile = Join-Path $OutputDir "$propId-$($errInfo.category).json"
+        
+        $proposal = [PSCustomObject]@{
+            proposalId = $propId
+            createdAt = (Get-Date -Format "o")
+            category = $errInfo.category
+            pattern = $errInfo.command
+            fingerprint = $fp
+            occurrences = $errInfo.count
+            cause = $errInfo.cause
+            remedy = $errInfo.remedy
+            action = if ($errInfo.alternative) { "USE_ALTERNATIVE" } elseif ($errInfo.category -in @("syntax_error", "quoting_error")) { "REWRITE" } else { "BLOCK" }
+            alternative = $errInfo.alternative
+            confidence = [Math]::Min(1.0, 0.6 + ($errInfo.count * 0.1))
+            status = "pending"
+        }
 
-    # Create deterministic proposal ID from fingerprint
-    $shortFp  = $fp.Key.Substring(0, 8)
-    $propId   = "prop-dyn-$shortFp"
-    $ruleId   = "rule-dyn-$shortFp"
-
-    # Skip if already accepted or in registry
-    $accFile  = "$acceptedDir\$propId.json"
-    if ((Test-Path $accFile) -or ($activeRuleIds -contains $ruleId)) { continue }
-
-    $propObj = [PSCustomObject]@{
-        proposalId       = $propId
-        version          = 1
-        scope            = "global"
-        status           = "pending"
-        pattern          = ($entry.command -replace '"', "'")
-        category         = $entry.category
-        shells           = @("powershell.exe")
-        platforms        = @("windows")
-        cause            = $entry.cause
-        action           = if ($entry.alternative) { "REWRITE" } else { "BLOCK" }
-        alternative      = $entry.alternative
-        remedy           = $entry.remedy
-        evidenceCount    = $entry.count
-        firstObserved    = $entry.firstObserved
-        lastObserved     = $entry.lastObserved
-        sampleFile       = $entry.sampleFile
-        confidence       = [math]::Min(1.0, [math]::Round($entry.count / 3.0, 2))
-        risk             = "low"
-        regressionTests  = @("test-preflight-$($entry.category)")
-        expiresAt        = (Get-Date).AddMonths(6).ToString("o")
-        lastValidated    = (Get-Date -Format "o")
-        rollbackAvailable = $true
+        $proposal | ConvertTo-Json -Depth 5 | Set-Content -Path $propFile -Encoding UTF8
+        $generatedProposals += $proposal
     }
-
-    $propFile = "$OutputDir\$propId.json"
-    $propObj | ConvertTo-Json -Depth 6 | Set-Content -Path $propFile -Encoding UTF8
-    $generatedProposals += $propObj
-    $counter++
 }
 
-# Statistical output
+# Output statistical JSON summary
 [PSCustomObject]@{
-    transcriptsScanned      = if ($transcriptFiles) { $transcriptFiles.Count } else { 0 }
+    transcriptsScanned = if ($transcriptFiles) { $transcriptFiles.Count } else { 0 }
     uniqueErrorFingerprints = $fingerprintMap.Keys.Count
-    newProposalsGenerated   = $generatedProposals.Count
-    proposals               = ($generatedProposals | Select-Object proposalId, pattern, category, action)
+    proposalsGenerated = $generatedProposals.Count
+    proposals = ($generatedProposals | Select-Object proposalId, pattern, category, action)
 } | ConvertTo-Json -Depth 5
-
-
-
