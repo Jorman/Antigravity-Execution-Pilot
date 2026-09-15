@@ -25,7 +25,6 @@ if ([string]::IsNullOrWhiteSpace($ConversationId)) {
     }
 }
 
-$foundErrors = @()
 $fingerprintMap = @{}
 
 foreach ($tf in $transcriptFiles) {
@@ -34,27 +33,34 @@ foreach ($tf in $transcriptFiles) {
     $lines = Get-Content $tf.FullName -ErrorAction SilentlyContinue
     if (-not $lines) { continue }
 
+    $lastRunCommand = ""
+
     foreach ($line in $lines) {
         if ([string]::IsNullOrWhiteSpace($line)) { continue }
         try {
             $step = $line | ConvertFrom-Json
             
-            # Check if step contains failed run_command
-            $hasError = ($step.status -eq "ERROR" -or ($step.content -match "The command exited with code [1-9]|ParseError|SyntaxError|Termine '.*' non riconosciuto|is not recognized"))
-            
-            if ($hasError) {
-                # Extract command
-                $cmd = ""
-                if ($step.tool_calls) {
-                    $tc = $step.tool_calls | Where-Object { $_.name -eq "run_command" } | Select-Object -First 1
-                    if ($tc -and $tc.args -and $tc.args.CommandLine) {
-                        $cmd = $tc.args.CommandLine
+            # If step contains run_command tool call, track command
+            if ($step.tool_calls) {
+                foreach ($tc in $step.tool_calls) {
+                    if ($tc.name -eq "run_command" -and $tc.args -and $tc.args.CommandLine) {
+                        $cmdVal = $tc.args.CommandLine
+                        if ($cmdVal -is [string]) {
+                            $lastRunCommand = $cmdVal.Trim('"')
+                        }
                     }
                 }
-                
-                # If command is missing in step, search content/thinking
+            }
+
+            # Check if step contains an execution error
+            $isErrorCode = ($step.content -match "The command exited with code [1-9]")
+            $isSyntaxErr = ($step.content -match "ParseError|SyntaxError|Termine '.*' non riconosciuto|is not recognized|Cannot find path|Authentication failed|Accesso negato")
+            $hasError = ($step.status -eq "ERROR" -or $isErrorCode -or $isSyntaxErr)
+
+            if ($hasError) {
+                $cmd = $lastRunCommand
                 if (-not $cmd -and $step.content) {
-                    if ($step.content -match 'CommandLine: ([^\r\n]+)') {
+                    if ($step.content -match 'CommandLine:\s*([^\r\n]+)') {
                         $cmd = $matches[1]
                     }
                 }
@@ -69,7 +75,7 @@ foreach ($tf in $transcriptFiles) {
                     if (-not $fingerprintMap.ContainsKey($fingerprint)) {
                         $stderr = $step.content
                         
-                        # Direct classification via function call without spawning subprocess
+                        # Direct classification via function call
                         $classObj = Classify-CommandError -Command $cmd -Stderr $stderr
                         
                         $fingerprintMap[$fingerprint] = @{
