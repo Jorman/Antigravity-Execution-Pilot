@@ -50,7 +50,7 @@ if ($CheckAntiRepetition) {
         $match = $recentErrors | Where-Object { 
             $_.commandFingerprint -eq $fingerprint -and 
             $_.status -eq "observed" -and 
-            (try { [DateTime]$_.timestamp -ge $cutoff } catch { $false })
+            $(&{ try { [DateTime]$_.timestamp -ge $cutoff } catch { $false } })
         }
         if ($match) {
             $out = [PSCustomObject]@{
@@ -69,8 +69,41 @@ if ($CheckAntiRepetition) {
     }
 }
 
+# Check machine-specific tool preferences (ADR-0003)
+$prefFile = "$env:USERPROFILE\.gemini\config\plugins\antigravity-execution-pilot\registry\tool-preferences.json"
+if (Test-Path $prefFile) {
+    try {
+        $prefs = Get-Content $prefFile -Raw -ErrorAction SilentlyContinue | ConvertFrom-Json
+        if ($prefs) {
+            foreach ($prop in $prefs.PSObject.Properties) {
+                $tool = $prop.Name
+                $entry = $prop.Value
+                if ($trimmed -match "(?i)^\s*$tool(\.exe)?\b") {
+                    if ($entry.choice -eq "alternative" -and $entry.use) {
+                        $action = "USE_ALTERNATIVE"
+                        $category = "missing_tool"
+                        $problems += "$tool is configured to use alternative '$($entry.use)'"
+                        $rewritten = $trimmed -replace "(?i)^\s*$tool(\.exe)?\b", $entry.use
+                        $motivation = "User preference: replace '$tool' with '$($entry.use)'."
+                        break
+                    } elseif ($entry.choice -eq "block") {
+                        $action = "BLOCK"
+                        $category = "missing_tool"
+                        $problems += "$tool is blocked by user preference"
+                        $motivation = "Tool '$tool' is disabled by user preference."
+                        break
+                    }
+                }
+            }
+        }
+    } catch {}
+}
+
 # Check for destructive commands
-if ($trimmed -match "(?i)\b(rmdir\s+/s\s+/q\s+[c-z]:\\|format\s+[c-z]:|drop\s+database|del\s+/s\s+/q\s+[c-z]:\\windows)") {
+if ($action -ne "ALLOW") {
+    # Handled by preference
+}
+elseif ($trimmed -match "(?i)\b(rmdir\s+/s\s+/q\s+[c-z]:\\|format\s+[c-z]:|drop\s+database|del\s+/s\s+/q\s+[c-z]:\\windows)") {
     $action = "BLOCK"
     $category = "destructive_operation"
     $problems += "Potentially destructive system command"
@@ -109,6 +142,14 @@ elseif ($trimmed -match "(?i)^\s*python(\.exe)?\s+-c\s+\S") {
     $problems += "python -c with complex inline strings causes SyntaxError on PowerShell"
     $rewritten = "Create a temporary .py file, run 'python file.py', and delete the file"
     $motivation = "Adopt the mandatory temporary .py script file pattern."
+}
+# Check for complex powershell -Command / -c
+elseif ($trimmed -match "(?i)^\s*powershell(\.exe)?\s+(-[a-zA-Z]+\s+)*-(c|command)\s+.*(\r|\n|\$|[=;])") {
+    $action = "REWRITE"
+    $category = "quoting_error"
+    $problems += "powershell -Command with inline script, newlines, or variables causes variable expansion and SyntaxError"
+    $rewritten = "Create a temporary .ps1 file, run 'powershell -ExecutionPolicy Bypass -File file.ps1', and delete the file"
+    $motivation = "Adopt the mandatory temporary .ps1 script file pattern for complex PowerShell code."
 }
 # Check for bash/zsh/sh
 elseif ($trimmed -match "(?i)^\s*(bash|zsh|sh)(\.exe)?\s+(-c\s+)?") {
