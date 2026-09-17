@@ -1,4 +1,4 @@
-﻿# 3. Hybrid Hook Intervention & Tool Preferences
+# 3. Hybrid Hook Intervention & Tool Preferences
 
 Date: 2026-09-17
 Status: Accepted

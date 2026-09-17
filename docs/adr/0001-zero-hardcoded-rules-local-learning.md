@@ -1,4 +1,4 @@
-﻿# 1. Zero Hardcoded Rules & Pure Local Learning
+# 1. Zero Hardcoded Rules & Pure Local Learning
 
 Date: 2026-09-17
 Status: Accepted

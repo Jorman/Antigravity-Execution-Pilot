@@ -142,7 +142,8 @@ foreach ($fp in $fingerprintMap.Keys) {
             status = "pending"
         }
 
-        $proposal | ConvertTo-Json -Depth 5 | Set-Content -Path $propFile -Encoding UTF8
+        $utf8NoBom = New-Object System.Text.UTF8Encoding $False
+        [System.IO.File]::WriteAllText($propFile, ($proposal | ConvertTo-Json -Depth 5), $utf8NoBom)
         $generatedProposals += $proposal
     }
 }

@@ -1,4 +1,4 @@
-﻿# 2. Strict Command Boundary Separation
+# 2. Strict Command Boundary Separation
 
 Date: 2026-09-17
 Status: Accepted

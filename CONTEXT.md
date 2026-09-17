@@ -1,4 +1,4 @@
-﻿# Antigravity Execution Pilot - Domain Context & Glossary
+# Antigravity Execution Pilot - Domain Context & Glossary
 
 ## Purpose
 A Windows PowerShell safety and governance middleware for Google Antigravity AI coding agents. Intercepts, validates, rewrites, and blocks terminal commands before execution, preventing cyclic failures, syntax incompatibilities, and destructive operations.
